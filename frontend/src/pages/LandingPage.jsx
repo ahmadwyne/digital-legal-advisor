@@ -820,7 +820,7 @@ const LandingPage = () => {
           </div>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight" style={{ fontFamily: "Poppins" }}>
-            Ready to <span className="bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400 bg-clip-text text-transparent animate-gradient-flow bg-[length:200%_auto]">Get Started</span>?
+            Ready to <span className="bg-gradient-to-r from-amber-800 via-yellow-400 to-amber-700 bg-clip-text text-transparent animate-gradient-flow bg-[length:200%_auto]">Get Started</span>?
           </h2>
 
           <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-2xl mx-auto leading-relaxed font-medium" style={{ fontFamily: "Inter" }}>
