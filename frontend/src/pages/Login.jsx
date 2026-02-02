@@ -264,9 +264,9 @@ const Login = () => {
               className="w-full max-w-md mx-auto lg:mx-0 animate-fade-in-up"
               style={{ animationDelay: "200ms" }}
             >
-              <div className="glass-effect p-6 sm:p-8 rounded-3xl shadow-2xl border-2 border-white/50 backdrop-blur-xl">
+              <div className="glass-effect p-6 sm:p-8 rounded-[2.5rem] shadow-2xl border-2 border-white/50 backdrop-blur-xl">
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-3">
                   {/* Email */}
                   <div>
                     <label
@@ -343,7 +343,7 @@ const Login = () => {
                   {/* 2. UPDATED: Reduced width (w-10/12) and centered (mx-auto block) */}
                   <button
                     type="submit"
-                    className="group relative w-[75%] mx-auto flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl text-base font-bold hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg overflow-hidden !mt-6"
+                    className="group relative w-[65%] mx-auto flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl text-base font-bold hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg overflow-hidden !mt-6"
                     style={{ fontFamily: "Inter" }}
                     disabled={isLoading}
                   >
@@ -380,7 +380,7 @@ const Login = () => {
                 <button
                   onClick={handleGoogleLogin}
                   type="button"
-                  className="group w-[75%] mx-auto bg-white border-2 border-gray-300 py-3 rounded-xl text-base font-semibold hover:bg-gray-50 hover:border-gray-400 hover:shadow-lg transition-all flex items-center justify-center gap-3 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group w-[65%] mx-auto bg-white border-2 border-gray-300 py-3 rounded-xl text-base font-semibold hover:bg-gray-50 hover:border-gray-400 hover:shadow-lg transition-all flex items-center justify-center gap-3 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ fontFamily: "Inter" }}
                   disabled={isLoading}
                 >
