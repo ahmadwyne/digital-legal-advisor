@@ -13,7 +13,7 @@ const supabase = createClient(
 
 const BUCKET_NAME = 'legal-datasets';
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks for optimal upload
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB max file size
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB max file size (Supabase free tier limit)
 
 /**
  * Calculate file checksum (SHA256)

@@ -132,6 +132,8 @@ export const ManageDatasets = () => {
     };
 
     const handleUpdateClick = (dataset) => {
+        setDetailsModalOpen(false);
+        setDeleteDialogOpen(false);
         setSelectedDataset(dataset);
         setUpdateModalOpen(true);
     };
@@ -148,6 +150,8 @@ export const ManageDatasets = () => {
     };
 
     const handleDeleteClick = (dataset) => {
+        setDetailsModalOpen(false);
+        setUpdateModalOpen(false);
         setSelectedDataset(dataset);
         setDeleteDialogOpen(true);
     };
@@ -226,6 +230,8 @@ export const ManageDatasets = () => {
     };
 
     const handleDetailsClick = (dataset) => {
+        setUpdateModalOpen(false);
+        setDeleteDialogOpen(false);
         setSelectedDataset(dataset);
         setDetailsModalOpen(true);
     };
@@ -577,7 +583,10 @@ export const ManageDatasets = () => {
                                                         <Button
                                                             size="sm"
                                                             variant="ghost"
-                                                            onClick={() => handleDownload(dataset)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDownload(dataset);
+                                                            }}
                                                             title="Download"
                                                         >
                                                             <Download className="h-4 w-4" />
@@ -585,7 +594,10 @@ export const ManageDatasets = () => {
                                                         <Button
                                                             size="sm"
                                                             variant="ghost"
-                                                            onClick={() => handleUpdateClick(dataset)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleUpdateClick(dataset);
+                                                            }}
                                                             title="Edit"
                                                         >
                                                             <Pencil className="h-4 w-4" />
@@ -594,7 +606,10 @@ export const ManageDatasets = () => {
                                                             <Button
                                                                 size="sm"
                                                                 variant="ghost"
-                                                                onClick={() => handleRestore(dataset)}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleRestore(dataset);
+                                                                }}
                                                                 title="Restore"
                                                             >
                                                                 <RefreshCw className="h-4 w-4 text-[#2C7A3E]" />
@@ -603,7 +618,10 @@ export const ManageDatasets = () => {
                                                             <Button
                                                                 size="sm"
                                                                 variant="ghost"
-                                                                onClick={() => handleArchive(dataset)}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleArchive(dataset);
+                                                                }}
                                                                 title="Archive"
                                                             >
                                                                 <Archive className="h-4 w-4 text-[#D19A00]" />
@@ -612,7 +630,10 @@ export const ManageDatasets = () => {
                                                         <Button
                                                             size="sm"
                                                             variant="ghost"
-                                                            onClick={() => handleDeleteClick(dataset)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteClick(dataset);
+                                                            }}
                                                             title="Delete"
                                                         >
                                                             <Trash2 className="h-4 w-4 text-destructive" />
@@ -666,39 +687,34 @@ export const ManageDatasets = () => {
                 onSuccess={handleUploadSuccess}
             />
 
+            <UpdateDatasetModal
+                open={updateModalOpen}
+                onClose={() => {
+                    setUpdateModalOpen(false);
+                    setSelectedDataset(null);
+                }}
+                dataset={selectedDataset}
+                onSuccess={handleUpdateSuccess}
+            />
 
-            {selectedDataset && (
-                <>
-                    <UpdateDatasetModal
-                        open={updateModalOpen}
-                        onClose={() => {
-                            setUpdateModalOpen(false);
-                            setSelectedDataset(null);
-                        }}
-                        dataset={selectedDataset}
-                        onSuccess={handleUpdateSuccess}
-                    />
+            <DeleteConfirmationDialog
+                open={deleteDialogOpen}
+                onClose={() => {
+                    setDeleteDialogOpen(false);
+                    setSelectedDataset(null);
+                }}
+                onConfirm={handleDeleteConfirm}
+                datasetName={selectedDataset?.name || ''}
+            />
 
-                    <DeleteConfirmationDialog
-                        open={deleteDialogOpen}
-                        onClose={() => {
-                            setDeleteDialogOpen(false);
-                            setSelectedDataset(null);
-                        }}
-                        onConfirm={handleDeleteConfirm}
-                        datasetName={selectedDataset.name}
-                    />
-
-                    <DatasetDetailsModal
-                        open={detailsModalOpen}
-                        onClose={() => {
-                            setDetailsModalOpen(false);
-                            setSelectedDataset(null);
-                        }}
-                        dataset={selectedDataset}
-                    />
-                </>
-            )}
+            <DatasetDetailsModal
+                open={detailsModalOpen}
+                onClose={() => {
+                    setDetailsModalOpen(false);
+                    setSelectedDataset(null);
+                }}
+                dataset={selectedDataset}
+            />
         </div>
     );
 };

@@ -1,27 +1,23 @@
-import axios from 'axios';
+import api from '@/api/axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
-
-// Create axios instance with default config
-const api = axios.create({
-    baseURL: API_URL,
-});
-
-// Add token to requests
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+// Remove empty/null/undefined values from params so express-validator
+// treats them as absent (truly optional) rather than invalid empty strings.
+const cleanParams = (params) => {
+    const cleaned = {};
+    for (const [key, value] of Object.entries(params)) {
+        if (value !== '' && value !== null && value !== undefined) {
+            cleaned[key] = value;
+        }
     }
-    return config;
-});
+    return cleaned;
+};
 
 export const datasetService = {
     /**
      * Get all datasets with filters and pagination
      */
     getAllDatasets: async (params) => {
-        const response = await api.get('/datasets', { params });
+        const response = await api.get('/datasets', { params: cleanParams(params) });
         return response.data;
     },
 
@@ -39,8 +35,9 @@ export const datasetService = {
     createDataset: async (formData) => {
         const response = await api.post('/datasets', formData, {
             headers: {
-                'Content-Type': 'multipart/form-data',
+                'Content-Type': undefined, // Let axios set multipart/form-data with correct boundary
             },
+            timeout: 120000, // 2 min timeout for file uploads
         });
         return response.data;
     },
@@ -51,8 +48,9 @@ export const datasetService = {
     updateDataset: async (id, formData) => {
         const response = await api.put(`/datasets/${id}`, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data',
+                'Content-Type': undefined, // Let axios set multipart/form-data with correct boundary
             },
+            timeout: 120000, // 2 min timeout for file uploads
         });
         return response.data;
     },

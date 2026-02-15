@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import ReactDOM from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -64,7 +57,7 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
 
     // Initialize form with dataset data
     useEffect(() => {
-        if (dataset) {
+        if (dataset && open) {
             setFormData({
                 name: dataset.name || '',
                 description: dataset.description || '',
@@ -76,13 +69,47 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                 isPublic: dataset.isPublic !== undefined ? dataset.isPublic : true,
                 status: dataset.status || 'active'
             });
+            // Reset file-related state when opening with new dataset
+            setSelectedFile(null);
+            setReplaceFile(false);
+            setErrors({});
+            setTagInput('');
         }
-    }, [dataset]);
+    }, [dataset, open]);
+
+    // Lock body scroll when modal is open
+    useEffect(() => {
+        if (open) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [open]);
+
+    // Handle Escape key
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape' && open && !loading) {
+                handleClose();
+            }
+        };
+
+        if (open) {
+            window.addEventListener('keydown', handleEscape);
+        }
+
+        return () => {
+            window.removeEventListener('keydown', handleEscape);
+        };
+    }, [open, loading]);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Validate file size (500MB max)
             if (file.size > 500 * 1024 * 1024) {
                 toast({
                     title: 'Error',
@@ -94,7 +121,6 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
 
             setSelectedFile(file);
 
-            // Update file format if changed
             const extension = file.name.split('.').pop().toLowerCase();
             if (['json', 'csv', 'txt', 'pdf', 'docx', 'xlsx'].includes(extension)) {
                 setFormData(prev => ({ ...prev, fileFormat: extension }));
@@ -144,6 +170,10 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
             newErrors.version = 'Version must be in format X.Y (e.g., 1.0)';
         }
 
+        if (replaceFile && !selectedFile) {
+            newErrors.file = 'Please select a file or click "Keep Current File"';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -165,7 +195,6 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
         try {
             const updateData = new FormData();
 
-            // Only add file if replacing
             if (replaceFile && selectedFile) {
                 updateData.append('file', selectedFile);
             }
@@ -218,42 +247,64 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
         }
     };
 
-    return (
-        <Dialog open={open} onOpenChange={(newOpen) => {
-            if (!loading) {
-                if (!newOpen) {
-                    handleClose();
-                } else {
-                    setOpen(newOpen);
-                }
-            }
-        }}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle className="text-2xl flex items-center gap-2">
-                        <RefreshCw className="h-6 w-6" />
-                        Update Dataset
-                    </DialogTitle>
-                    <DialogDescription>
-                        Update dataset information or replace the file
-                    </DialogDescription>
-                </DialogHeader>
+    if (!open || !dataset) return null;
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+    const modalContent = (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={(e) => {
+                if (e.target === e.currentTarget && !loading) {
+                    handleClose();
+                }
+            }}
+        >
+            <div
+                className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="sticky top-0 bg-white dark:bg-gray-900 border-b p-6 z-10">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-2xl font-bold flex items-center gap-2">
+                                <RefreshCw className="h-6 w-6" />
+                                Update Dataset
+                            </h2>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Update dataset information or replace the file
+                            </p>
+                        </div>
+                        <button
+                            onClick={handleClose}
+                            disabled={loading}
+                            className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     {/* Current File Info */}
-                    <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium">Current File</p>
-                                <p className="text-sm text-muted-foreground">
-                                    {dataset?.name}.{dataset?.fileFormat}
+                                <p className="text-sm text-gray-500">
+                                    {dataset.name}.{dataset.fileFormat}
                                 </p>
                             </div>
                             <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                onClick={() => setReplaceFile(!replaceFile)}
+                                onClick={() => {
+                                    setReplaceFile(!replaceFile);
+                                    if (replaceFile) {
+                                        setSelectedFile(null);
+                                    }
+                                }}
                             >
                                 {replaceFile ? 'Keep Current File' : 'Replace File'}
                             </Button>
@@ -263,24 +314,24 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                     {/* File Upload (if replacing) */}
                     {replaceFile && (
                         <div className="space-y-2">
-                            <Label htmlFor="file">
-                                New Dataset File
+                            <Label htmlFor="update-file">
+                                New Dataset File *
                             </Label>
                             <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
                                 <input
-                                    id="file"
+                                    id="update-file"
                                     type="file"
                                     accept=".json,.csv,.txt,.pdf,.docx,.xlsx"
                                     onChange={handleFileChange}
                                     className="hidden"
                                 />
-                                <label htmlFor="file" className="cursor-pointer">
+                                <label htmlFor="update-file" className="cursor-pointer">
                                     {selectedFile ? (
                                         <div className="flex items-center justify-center gap-3">
                                             <FileText className="h-8 w-8 text-primary" />
                                             <div className="text-left">
                                                 <p className="font-medium">{selectedFile.name}</p>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-sm text-gray-500">
                                                     {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                                                 </p>
                                             </div>
@@ -290,6 +341,7 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                                                 size="sm"
                                                 onClick={(e) => {
                                                     e.preventDefault();
+                                                    e.stopPropagation();
                                                     setSelectedFile(null);
                                                 }}
                                             >
@@ -298,27 +350,33 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                                         </div>
                                     ) : (
                                         <div>
-                                            <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                                            <Upload className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                                             <p className="text-sm font-medium">
                                                 Click to upload new file
                                             </p>
-                                            <p className="text-xs text-muted-foreground mt-1">
+                                            <p className="text-xs text-gray-500 mt-1">
                                                 JSON, CSV, TXT, PDF, DOCX, XLSX (Max 500MB)
                                             </p>
                                         </div>
                                     )}
                                 </label>
                             </div>
+                            {errors.file && (
+                                <p className="text-sm text-destructive flex items-center gap-1">
+                                    <AlertCircle className="h-3 w-3" />
+                                    {errors.file}
+                                </p>
+                            )}
                         </div>
                     )}
 
                     {/* Dataset Name */}
                     <div className="space-y-2">
-                        <Label htmlFor="name" className="required">
+                        <Label htmlFor="update-name">
                             Dataset Name *
                         </Label>
                         <Input
-                            id="name"
+                            id="update-name"
                             placeholder="e.g., Pakistan Financial Laws 2026"
                             value={formData.name}
                             onChange={(e) => handleInputChange('name', e.target.value)}
@@ -334,9 +392,9 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
 
                     {/* Description */}
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="update-description">Description</Label>
                         <Textarea
-                            id="description"
+                            id="update-description"
                             placeholder="Brief description of the dataset contents..."
                             value={formData.description}
                             onChange={(e) => handleInputChange('description', e.target.value)}
@@ -347,7 +405,7 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                     {/* Category and Status */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="category" className="required">
+                            <Label htmlFor="update-category">
                                 Category *
                             </Label>
                             <Select
@@ -365,10 +423,16 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            {errors.category && (
+                                <p className="text-sm text-destructive flex items-center gap-1">
+                                    <AlertCircle className="h-3 w-3" />
+                                    {errors.category}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="status">Status</Label>
+                            <Label htmlFor="update-status">Status</Label>
                             <Select
                                 value={formData.status}
                                 onValueChange={(value) => handleInputChange('status', value)}
@@ -390,9 +454,9 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                     {/* Version and Jurisdiction */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="version">Version</Label>
+                            <Label htmlFor="update-version">Version</Label>
                             <Input
-                                id="version"
+                                id="update-version"
                                 placeholder="1.0"
                                 value={formData.version}
                                 onChange={(e) => handleInputChange('version', e.target.value)}
@@ -407,9 +471,9 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="jurisdiction">Jurisdiction</Label>
+                            <Label htmlFor="update-jurisdiction">Jurisdiction</Label>
                             <Input
-                                id="jurisdiction"
+                                id="update-jurisdiction"
                                 placeholder="e.g., Pakistan, Punjab"
                                 value={formData.jurisdiction}
                                 onChange={(e) => handleInputChange('jurisdiction', e.target.value)}
@@ -419,14 +483,14 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
 
                     {/* Tags */}
                     <div className="space-y-2">
-                        <Label htmlFor="tags">Tags (Max 20)</Label>
+                        <Label htmlFor="update-tags">Tags (Max 20)</Label>
                         <div className="flex gap-2">
                             <Input
-                                id="tags"
+                                id="update-tags"
                                 placeholder="Add a tag..."
                                 value={tagInput}
                                 onChange={(e) => setTagInput(e.target.value)}
-                                onKeyPress={(e) => {
+                                onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                         e.preventDefault();
                                         handleAddTag();
@@ -469,17 +533,18 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                     <div className="flex items-center space-x-2">
                         <input
                             type="checkbox"
-                            id="isPublic"
+                            id="update-isPublic"
                             checked={formData.isPublic}
                             onChange={(e) => handleInputChange('isPublic', e.target.checked)}
                             className="rounded border-gray-300"
                         />
-                        <Label htmlFor="isPublic" className="cursor-pointer">
+                        <Label htmlFor="update-isPublic" className="cursor-pointer">
                             Make this dataset publicly accessible
                         </Label>
                     </div>
 
-                    <DialogFooter>
+                    {/* Footer */}
+                    <div className="flex justify-end gap-3 pt-4 border-t">
                         <Button
                             type="button"
                             variant="outline"
@@ -501,9 +566,12 @@ export const UpdateDatasetModal = ({ open, onClose, dataset, onSuccess }) => {
                                 </>
                             )}
                         </Button>
-                    </DialogFooter>
+                    </div>
                 </form>
-            </DialogContent>
-        </Dialog>
+            </div>
+        </div>
     );
+
+    const portalRoot = document.getElementById('portal-root') || document.body;
+    return ReactDOM.createPortal(modalContent, portalRoot);
 };
