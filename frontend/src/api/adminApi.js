@@ -3,7 +3,7 @@ import axiosInstance from './axios';
 export const adminApi = {
   // Get full dashboard data
   getDashboard: async () => {
-    const response = await axiosInstance.get('/admin/dashboard');
+    const response = await axiosInstance.get('/admin/dashboard', { timeout: 30000 });
     return response.data;
   },
 
