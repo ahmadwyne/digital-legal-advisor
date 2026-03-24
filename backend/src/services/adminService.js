@@ -22,11 +22,11 @@ class AdminService {
       });
 
       // Dataset usage calculation
-      const totalDatasets = await Dataset.count({ where: { isActive: true } });
+      const totalDatasets = await Dataset.count({ where: { isDeleted: false } });
       const usedDatasets = await Dataset.count({
         where: {
-          isActive: true,
-          usageCount: {
+          isDeleted: false,
+          queryCount: {
             [Op.gt]: 0
           }
         }
@@ -74,7 +74,7 @@ class AdminService {
         : 0;
 
       // Dataset usage trend (this week vs last week)
-      const usageThisWeek = await Dataset.sum('usageCount', {
+      const usageThisWeek = await Dataset.sum('queryCount', {
         where: {
           updatedAt: {
             [Op.gte]: sevenDaysAgo
@@ -82,8 +82,8 @@ class AdminService {
         }
       }) || 0;
 
-      const usageTwoWeeksAgo = new Date(Date. now() - 14 * 24 * 60 * 60 * 1000);
-      const usageLastWeek = await Dataset.sum('usageCount', {
+      const usageTwoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+      const usageLastWeek = await Dataset.sum('queryCount', {
         where: {
           updatedAt: {
             [Op.between]: [usageTwoWeeksAgo, sevenDaysAgo]
@@ -119,22 +119,22 @@ class AdminService {
         case 'week':
           startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
           dateFormat = '%Y-%m-%d';
-          groupBy = sequelize.fn('DATE', sequelize.col('createdAt'));
+          groupBy = sequelize.fn('DATE_TRUNC', 'day', sequelize.col('createdAt'));
           break;
         case 'month':
           startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
           dateFormat = '%Y-%m-%d';
-          groupBy = sequelize. fn('DATE', sequelize.col('createdAt'));
+          groupBy = sequelize.fn('DATE_TRUNC', 'day', sequelize.col('createdAt'));
           break;
         case 'year': 
           startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
           dateFormat = '%Y-%m';
-          groupBy = sequelize. fn('DATE_TRUNC', 'month', sequelize.col('createdAt'));
+          groupBy = sequelize.fn('DATE_TRUNC', 'month', sequelize.col('createdAt'));
           break;
         default:
           startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
           dateFormat = '%Y-%m-%d';
-          groupBy = sequelize.fn('DATE', sequelize.col('createdAt'));
+          groupBy = sequelize.fn('DATE_TRUNC', 'day', sequelize.col('createdAt'));
       }
 
       const activityData = await Query.findAll({
