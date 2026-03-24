@@ -10,7 +10,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { adminApi } from "@/api/adminApi";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast.js";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +45,7 @@ export const AdminDashboard = () => {
 
         if (isRefresh) {
           toast({
+            variant: "success",
             title: "Success",
             description: "Dashboard data refreshed successfully",
           });

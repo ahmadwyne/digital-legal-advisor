@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X, Loader2, Mail, ArrowRight } from "lucide-react";
 import { authApi } from "@/api/authApi";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast.js";
 import { getErrorMessage } from "@/utils/errorHandler";
 
 const ForgotPasswordModal = ({ isOpen, onClose }) => {

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import { authApi } from '@/api/authApi';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast.js';
 
 const EmailVerification = () => {
   const [searchParams] = useSearchParams();

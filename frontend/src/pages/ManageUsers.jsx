@@ -374,7 +374,7 @@ import {
 } from '@/components/ui/pagination';
 import { Users, UserCheck, UserX, RefreshCw, Search } from 'lucide-react';
 import { userApi } from '@/api/userApi';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast.js';
 import { filterAdminUsers } from '@/utils/userFilters';
 import { cn } from '@/lib/utils';
 
@@ -544,6 +544,7 @@ export const ManageUsers = () => {
 
       if (response.status === 'success') {
         toast({
+          variant: 'success',
           title: 'Success',
           description: `User ${action}d successfully`,
         });

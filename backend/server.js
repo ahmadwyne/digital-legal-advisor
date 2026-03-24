@@ -12,15 +12,13 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('✅ Database connection established successfully.');
 
-    // Sync database — avoid { alter: true } on Supabase pooled connections
-    // as long-running ALTER TABLE statements get killed by PgBouncer.
-    // Use migrations for schema changes instead.
-    await sequelize.sync();
-    console.log('✅ Database synchronized successfully.');
-
-    // Initialize Supabase storage bucket
+    // Ensure Supabase storage bucket exists
     await initializeBucket();
-    console.log('✅ Supabase storage bucket initialized.');
+    console.log('✅ Supabase storage bucket ready.');
+
+    // Sync database (use { force: true } to drop tables - only in development)
+    // await sequelize. sync({ alter: true });
+    // console.log('✅ Database synchronized successfully.');
 
     // Start server
     app.listen(PORT, () => {

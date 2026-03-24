@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { setTokens } from '@/utils/tokenManager';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast.js';
 import { Loader2 } from 'lucide-react';
 import { authApi } from '@/api/authApi';
 
