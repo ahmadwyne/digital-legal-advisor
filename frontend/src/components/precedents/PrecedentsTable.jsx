@@ -1,11 +1,14 @@
 import PrecedentRow from './PrecedentRow';
+import LogoSpinner from '@/components/ui/LogoSpinner';
 
 const PrecedentsTable = ({ precedents, onDownload, isLoading }) => {
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-gray-300 border-t-[#29473E] rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="flex items-center justify-center mb-4">
+            <LogoSpinner size={48} />
+          </div>
           <p 
             className="text-gray-600"
             style={{ fontFamily: 'Noto Sans' }}

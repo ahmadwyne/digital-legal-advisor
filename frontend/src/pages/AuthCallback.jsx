@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { setTokens } from '@/utils/tokenManager';
 import { useToast } from '@/hooks/use-toast.js';
-import { Loader2 } from 'lucide-react';
+import LogoSpinner from '@/components/ui/LogoSpinner';
 import { authApi } from '@/api/authApi';
 
 const AuthCallback = () => {
@@ -70,7 +70,9 @@ const AuthCallback = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="text-center">
-        <Loader2 className="w-12 h-12 animate-spin text-[#29473E] mx-auto mb-4" />
+        <div className="flex items-center justify-center mb-4">
+          <LogoSpinner size={56} />
+        </div>
         <h2 className="text-xl font-semibold text-gray-700">
           Completing authentication...
         </h2>

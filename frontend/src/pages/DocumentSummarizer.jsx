@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UploadCloud, FileText, CheckCircle, ArrowRight, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LogoSpinner from '@/components/ui/LogoSpinner';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -78,7 +79,9 @@ export default function DocumentSummarizer() {
 
           {isProcessing && (
             <div className="bg-white border-2 border-blue-100 rounded-3xl p-16 text-center shadow-lg animate-pulse">
-              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6" />
+              <div className="flex items-center justify-center mb-6">
+                <LogoSpinner size={64} />
+              </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2" style={{ fontFamily: "Poppins" }}>Analyzing Document...</h3>
               <p className="text-gray-500 font-medium text-sm">Extracting key clauses and entities.</p>
             </div>

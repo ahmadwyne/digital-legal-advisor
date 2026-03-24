@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Mail, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Mail, CheckCircle, XCircle } from 'lucide-react';
 import Header from '@/components/Header';
 import { authApi } from '@/api/authApi';
+import LogoSpinner from '@/components/ui/LogoSpinner';
 import { useToast } from '@/hooks/use-toast.js';
 
 const EmailVerification = () => {
@@ -63,7 +64,9 @@ const EmailVerification = () => {
         <div className="bg-white rounded-lg shadow-xl p-12 max-w-md w-full text-center">
           {status === 'verifying' && (
             <>
-              <Loader2 className="w-16 h-16 animate-spin text-[#29473E] mx-auto mb-6" />
+              <div className="flex items-center justify-center mb-6">
+                <LogoSpinner size={64} />
+              </div>
               <h1
                 className="text-2xl font-bold text-[#44444E] mb-2"
                 style={{ fontFamily: 'Roboto Mono' }}

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast.js';
+import LogoSpinner from '@/components/ui/LogoSpinner';
 
 // IMPORT YOUR MODALS HERE (Adjust the paths if they are in a different folder)
 import { DatasetDetailsModal } from '../components/datasets/DatasetDetailsModal';
@@ -434,7 +435,9 @@ export const ManageDatasets = () => {
                 {loading && datasets.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-12">
-                       <RefreshCw className="h-8 w-8 animate-spin mx-auto text-blue-500" />
+                       <div className="flex items-center justify-center">
+                         <LogoSpinner size={48} />
+                       </div>
                        <p className="text-gray-500 mt-2 font-semibold">Loading datasets...</p>
                     </TableCell>
                   </TableRow>

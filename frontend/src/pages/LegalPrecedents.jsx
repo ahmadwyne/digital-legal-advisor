@@ -3,6 +3,7 @@ import { Search, Menu, Scale, Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import LogoSpinner from '@/components/ui/LogoSpinner';
 import { cn } from '@/lib/utils';
 
 export default function LegalPrecedents() {
@@ -76,7 +77,9 @@ export default function LegalPrecedents() {
         {isLoading && (
           <div className="flex justify-center py-20 animate-pulse">
             <div className="text-center">
-              <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+              <div className="flex items-center justify-center mb-4">
+                <LogoSpinner size={48} />
+              </div>
               <p className="text-gray-600 font-bold" style={{ fontFamily: "Inter" }}>Retrieving precedents...</p>
             </div>
           </div>

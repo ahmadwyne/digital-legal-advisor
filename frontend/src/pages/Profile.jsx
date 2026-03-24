@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, User, Mail, Phone, Calendar, Shield } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Shield } from 'lucide-react';
 import Header from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
+import LogoSpinner from '@/components/ui/LogoSpinner';
 import { userApi } from '@/api/userApi';
 import { useToast } from '@/hooks/use-toast.js';
 import { getErrorMessage } from '@/utils/errorHandler';
@@ -65,7 +66,7 @@ const Profile = () => {
   if (! authUser) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-[#29473E]" />
+        <LogoSpinner size={48} />
       </div>
     );
   }

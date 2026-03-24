@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2 } from 'lucide-react';
+import LogoSpinner from '@/components/ui/LogoSpinner';
 
 const ProtectedRoute = ({ children, allowAdminAccess = true }) => {
   const { isAuth, user, loading } = useAuth();
@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children, allowAdminAccess = true }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-12 h-12 animate-spin text-[#29473E]" />
+        <LogoSpinner size={56} />
       </div>
     );
   }
