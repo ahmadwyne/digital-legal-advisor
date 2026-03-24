@@ -4,7 +4,8 @@ module.exports = (sequelize) => {
   const Dataset = sequelize.define('Dataset', {
     id: {
       type: DataTypes.UUID,
-      primaryKey: true
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4
     },
 
     datasetType: {
@@ -17,7 +18,7 @@ module.exports = (sequelize) => {
     category: DataTypes.STRING,
     version: DataTypes.STRING,
     status: DataTypes.STRING,
-    tags: DataTypes.STRING,
+    tags: DataTypes.ARRAY(DataTypes.STRING),
     jurisdiction: DataTypes.STRING,
     metadata: DataTypes.JSONB,
     checksum: DataTypes.STRING,
@@ -49,10 +50,18 @@ module.exports = (sequelize) => {
     ],
     hooks: {
       beforeCreate: (dataset) => {
-        if (dataset.tags) dataset.tags = dataset.tags.map(t => t.toLowerCase().trim());
+        if (Array.isArray(dataset.tags)) {
+          dataset.tags = dataset.tags
+            .map(t => `${t}`.toLowerCase().trim())
+            .filter(Boolean);
+        }
       },
       beforeUpdate: (dataset) => {
-        if (dataset.changed('tags') && dataset.tags) dataset.tags = dataset.tags.map(t => t.toLowerCase().trim());
+        if (dataset.changed('tags') && Array.isArray(dataset.tags)) {
+          dataset.tags = dataset.tags
+            .map(t => `${t}`.toLowerCase().trim())
+            .filter(Boolean);
+        }
       }
     }
   });

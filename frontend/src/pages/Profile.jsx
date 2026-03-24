@@ -4,7 +4,7 @@ import { Loader2, User, Mail, Phone, Calendar, Shield } from 'lucide-react';
 import Header from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { userApi } from '@/api/userApi';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast.js';
 import { getErrorMessage } from '@/utils/errorHandler';
 
 const Profile = () => {

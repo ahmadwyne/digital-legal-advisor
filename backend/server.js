@@ -12,6 +12,10 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('✅ Database connection established successfully.');
 
+    // Ensure Supabase storage bucket exists
+    await initializeBucket();
+    console.log('✅ Supabase storage bucket ready.');
+
     // Sync database (use { force: true } to drop tables - only in development)
     // await sequelize. sync({ alter: true });
     // console.log('✅ Database synchronized successfully.');

@@ -166,6 +166,7 @@ import { Star, MessageSquare, TrendingUp, RefreshCw, Filter, Search } from 'luci
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast.js';
 
 /**
  * Mock Feedback Data
@@ -248,6 +249,7 @@ const ratingDistribution = [
  * - Smooth animations
  */
 export const FeedbackMonitoring = () => {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [filterRating, setFilterRating] = useState('all');
 
@@ -299,6 +301,11 @@ export const FeedbackMonitoring = () => {
     // TODO: Implement actual API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     setLoading(false);
+    toast({
+      variant: 'success',
+      title: 'Refreshed',
+      description: 'Feedback data updated',
+    });
   };
 
   /**

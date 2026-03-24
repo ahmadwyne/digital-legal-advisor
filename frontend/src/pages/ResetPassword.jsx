@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import { authApi } from '@/api/authApi';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast.js';
 import { getErrorMessage } from '@/utils/errorHandler';
 
 const ResetPassword = () => {

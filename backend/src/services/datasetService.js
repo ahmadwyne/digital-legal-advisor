@@ -4,6 +4,33 @@ const { getPagination } = require('../utils/pagination');
 const storageUtil = require('../utils/supabaseStorage');
 
 class DatasetService {
+  normalizeTags(tags) {
+    if (!tags) return null;
+    if (Array.isArray(tags)) {
+      return tags
+        .map(tag => `${tag}`.trim().toLowerCase())
+        .filter(Boolean);
+    }
+    if (typeof tags === 'string') {
+      const parsed = tags
+        .split(',')
+        .map(tag => tag.trim().toLowerCase())
+        .filter(Boolean);
+      return parsed.length ? parsed : null;
+    }
+    return null;
+  }
+
+  mapDatasetType(category) {
+    const mapping = {
+      case_law: 'case_law',
+      statutes: 'statute',
+      regulations: 'regulation',
+      precedents: 'precedent'
+    };
+    return mapping[category] || 'case_law';
+  }
+
   /**
    * Get all datasets with pagination, search, and filters
    */
@@ -36,10 +63,10 @@ class DatasetService {
         where[Op.or] = [
           { name: { [Op.iLike]: `%${search}%` } },
           { description: { [Op.iLike]: `%${search}%` } },
-          sequelize.literal(`EXISTS (
-            SELECT 1 FROM unnest(tags) AS tag 
-            WHERE tag ILIKE '%${search}%'
-          )`)
+          sequelize.where(
+            sequelize.fn('array_to_string', sequelize.col('tags'), ','),
+            { [Op.iLike]: `%${search}%` }
+          )
         ];
       }
 
@@ -65,10 +92,12 @@ class DatasetService {
 
       // Tags filter (search for any matching tag)
       if (tags) {
-        const tagArray = Array.isArray(tags) ? tags : [tags];
-        where[Op.and] = tagArray.map(tag => 
-          sequelize.literal(`'${tag.toLowerCase()}' = ANY(tags)`)
-        );
+        const tagArray = (Array.isArray(tags) ? tags : [tags])
+          .map(tag => `${tag}`.toLowerCase().trim())
+          .filter(Boolean);
+        if (tagArray.length) {
+          where.tags = { [Op.overlap]: tagArray };
+        }
       }
 
       // Get pagination details
@@ -146,7 +175,7 @@ class DatasetService {
     const transaction = await sequelize.transaction();
 
     try {
-      const { 
+      const {
         name, 
         description, 
         category, 
@@ -172,6 +201,7 @@ class DatasetService {
 
       // Create dataset record
       const dataset = await Dataset.create({
+        datasetType: this.mapDatasetType(category),
         name,
         description,
         category,
@@ -183,7 +213,7 @@ class DatasetService {
         version,
         status: 'active',
         isPublic: isPublic !== undefined ? isPublic : true,
-        tags: tags || [],
+        tags: this.normalizeTags(tags),
         jurisdiction,
         dateRange,
         metadata: {
@@ -238,7 +268,7 @@ class DatasetService {
       if (updateData.description !== undefined) updates.description = updateData.description;
       if (updateData.category !== undefined) updates.category = updateData.category;
       if (updateData.version !== undefined) updates.version = updateData.version;
-      if (updateData.tags !== undefined) updates.tags = updateData.tags;
+      if (updateData.tags !== undefined) updates.tags = this.normalizeTags(updateData.tags);
       if (updateData.jurisdiction !== undefined) updates.jurisdiction = updateData.jurisdiction;
       if (updateData.dateRange !== undefined) updates.dateRange = updateData.dateRange;
       if (updateData.isPublic !== undefined) updates.isPublic = updateData.isPublic;

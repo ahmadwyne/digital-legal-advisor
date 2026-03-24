@@ -1,180 +1,4 @@
-// import React from 'react';
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// import { Button } from '@/components/ui/button';
-// import { Badge } from '@/components/ui/badge';
-// import {
-//     Table,
-//     TableBody,
-//     TableCell,
-//     TableHead,
-//     TableHeader,
-//     TableRow,
-// } from '@/components/ui/table';
-// import { Upload, Pencil, Trash2 } from 'lucide-react';
-
-// const mockDatasets = [
-//     {
-//         title: 'Financial Regulations 2023',
-//         description: 'Comprehensive dataset of financial regulations...',
-//         lastUpdated: 'May 15, 2023',
-//         status: 'Active',
-//     },
-//     {
-//         title: 'Corporate Tax Law Cases',
-//         description: 'Collection of landmark corporate tax law...',
-//         lastUpdated: 'Apr 28, 2023',
-//         status: 'Active',
-//     },
-//     {
-//         title: 'Banking Statutes Update',
-//         description: 'Updated banking statutes including rec...',
-//         lastUpdated: 'May 22, 2023',
-//         status: 'Pending',
-//     },
-//     {
-//         title: 'Securities Law Compilation',
-//         description: 'Compilation of securities law with annot...',
-//         lastUpdated: 'May 10, 2023',
-//         status: 'Error',
-//     },
-//     {
-//         title: 'International Trade Regulations',
-//         description: 'Dataset covering international trade reg...',
-//         lastUpdated: 'May 18, 2023',
-//         status: 'Active',
-//     },
-// ];
-
-// const validationStats = [
-//     { label: 'Validated Datasets', value: 42, color: 'border-success' },
-//     { label: 'Pending Validation', value: 7, color: 'border-warning' },
-//     { label: 'Validation Errors', value: 3, color: 'border-error' },
-//     { label: 'Total Datasets', value: 52, color: 'border-foreground' },
-// ];
-
-// export const ManageDatasets = () => {
-//     const handleAction = (action, dataset) => {
-//         console.log(`${action} dataset:`, dataset);
-//     };
-
-//     const getStatusColor = (status) => {
-//         switch (status) {
-//             case "Active":
-//                 return "text-[#2C7A3E]";
-//             case "Pending":
-//                 return "text-[#D19A00]";
-//             case "Error":
-//                 return "text-[#D12A2A]";
-//             default:
-//                 return "text-gray-600";
-//         }
-//     };
-
-//     return (
-//         <div className="space-y-6 sm:space-y-8">
-//             {/* Header */}
-//             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-//                 <div>
-//                     <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Manage Legal Datasets</h1>
-//                     <p className="text-sm sm:text-base text-muted-foreground mt-1">Upload and manage legal datasets for the chatbot</p>
-//                 </div>
-//                 <Button className="bg-primary hover:bg-primary-hover text-primary-foreground w-full sm:w-auto">
-//                     <Upload className="mr-2 h-4 w-4" />
-//                     Upload New Dataset
-//                 </Button>
-//             </div>
-
-//             {/* All Datasets */}
-//             <Card>
-//                 <CardHeader>
-//                     <CardTitle className="text-lg sm:text-xl">All Datasets</CardTitle>
-//                 </CardHeader>
-//                 <CardContent>
-//                     <div className="rounded-md border overflow-x-auto">
-//                         <Table>
-//                             <TableHeader>
-//                                 <TableRow>
-//                                     <TableHead className="min-w-[150px]">Title</TableHead>
-//                                     <TableHead className="min-w-[200px] hidden sm:table-cell">Description</TableHead>
-//                                     <TableHead className="min-w-[120px]">Last Updated</TableHead>
-//                                     <TableHead className="min-w-[100px]">Status</TableHead>
-//                                     <TableHead className="text-right min-w-[120px]">Actions</TableHead>
-//                                 </TableRow>
-//                             </TableHeader>
-//                             <TableBody>
-//                                 {mockDatasets.map((dataset, index) => (
-//                                     <TableRow key={index}>
-//                                         <TableCell className="font-medium">{dataset.title}</TableCell>
-//                                         <TableCell className="text-muted-foreground hidden sm:table-cell">{dataset.description}</TableCell>
-//                                         <TableCell className="text-muted-foreground text-sm">{dataset.lastUpdated}</TableCell>
-//                                         <TableCell>
-//                                             <Badge
-//                                                 className={`
-//                                                     bg-[#E5E7EB]
-//                                                     ${getStatusColor(dataset.status)}
-//                                                     w-[63.34px]
-//                                                     h-[18px]
-//                                                     flex items-center justify-center
-//                                                     rounded-full
-//                                                     text-xs font-medium
-//                                                     px-0 py-0
-//                                                 `}
-//                                             >
-//                                                 {dataset.status}
-//                                             </Badge>
-//                                         </TableCell>
-//                                         <TableCell className="text-right">
-//                                             <div className="flex items-center justify-end gap-2">
-//                                                 <Button
-//                                                     size="sm"
-//                                                     variant="ghost"
-//                                                     onClick={() => handleAction('edit', dataset)}
-//                                                 >
-//                                                     <Pencil className="h-4 w-4" />
-//                                                 </Button>
-//                                                 <Button
-//                                                     size="sm"
-//                                                     variant="ghost"
-//                                                     onClick={() => handleAction('delete', dataset)}
-//                                                 >
-//                                                     <Trash2 className="h-4 w-4 text-destructive" />
-//                                                 </Button>
-//                                             </div>
-//                                         </TableCell>
-//                                     </TableRow>
-//                                 ))}
-//                             </TableBody>
-//                         </Table>
-//                     </div>
-//                 </CardContent>
-//             </Card>
-
-//             {/* Dataset Validation Status */}
-//             <Card>
-//                 <CardHeader>
-//                     <CardTitle className="text-lg sm:text-xl">Dataset Validation Status</CardTitle>
-//                 </CardHeader>
-//                 <CardContent>
-//                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-//                         {validationStats.map((stat, index) => (
-//                             <div
-//                                 key={index}
-//                                 className={`p-4 sm:p-6 rounded-lg border-l-4 bg-card ${stat.color}`}
-//                             >
-//                                 <p className="text-3xl sm:text-4xl font-bold text-foreground mb-2">{stat.value}</p>
-//                                 <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
-//                             </div>
-//                         ))}
-//                     </div>
-//                 </CardContent>
-//             </Card>
-//         </div>
-//     );
-// };
-
-// export default ManageDatasets;
-
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -196,173 +20,209 @@ import {
   Clock, 
   AlertCircle,
   Eye,
-  Download
+  Archive
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast.js';
+
+// IMPORT YOUR MODALS HERE (Adjust the paths if they are in a different folder)
+import { DatasetDetailsModal } from '../components/datasets/DatasetDetailsModal';
+import { DeleteConfirmationDialog } from '../components/datasets/DeleteConfirmationDialogue';
+import { UpdateDatasetModal } from '../components/datasets/UpdateDatasetModal';
+import { UploadDatasetModal } from '../components/datasets/UploadDatasetModal';
 
 /**
- * Mock Datasets Data
- * TODO: Replace with actual API call
- */
-const mockDatasets = [
-  {
-    id: 1,
-    title: 'Financial Regulations 2023',
-    description: 'Comprehensive dataset of financial regulations and compliance standards',
-    lastUpdated: 'May 15, 2023',
-    status: 'Active',
-    size: '2.4 MB',
-    records: 1250
-  },
-  {
-    id: 2,
-    title: 'Corporate Tax Law Cases',
-    description: 'Collection of landmark corporate tax law cases and precedents',
-    lastUpdated: 'Apr 28, 2023',
-    status: 'Active',
-    size: '3.1 MB',
-    records: 980
-  },
-  {
-    id: 3,
-    title: 'Banking Statutes Update',
-    description: 'Updated banking statutes including recent amendments',
-    lastUpdated: 'May 22, 2023',
-    status: 'Pending',
-    size: '1.8 MB',
-    records: 650
-  },
-  {
-    id: 4,
-    title: 'Securities Law Compilation',
-    description: 'Compilation of securities law with annotations and references',
-    lastUpdated: 'May 10, 2023',
-    status: 'Error',
-    size: '2.9 MB',
-    records: 1100
-  },
-  {
-    id: 5,
-    title: 'International Trade Regulations',
-    description: 'Dataset covering international trade regulations and treaties',
-    lastUpdated: 'May 18, 2023',
-    status: 'Active',
-    size: '4.2 MB',
-    records: 1850
-  },
-];
-
-/**
- * Validation Statistics Data
- */
-const validationStats = [
-  { 
-    label: 'Validated Datasets', 
-    value: 42, 
-    color: 'from-green-500 to-emerald-500',
-    bgColor: 'from-green-50 to-emerald-50',
-    icon: CheckCircle,
-    iconColor: 'text-green-600'
-  },
-  { 
-    label: 'Pending Validation', 
-    value: 7, 
-    color: 'from-amber-500 to-yellow-500',
-    bgColor: 'from-amber-50 to-yellow-50',
-    icon: Clock,
-    iconColor: 'text-amber-600'
-  },
-  { 
-    label: 'Validation Errors', 
-    value: 3, 
-    color: 'from-red-500 to-rose-500',
-    bgColor: 'from-red-50 to-rose-50',
-    icon: AlertCircle,
-    iconColor: 'text-red-600'
-  },
-  { 
-    label: 'Total Datasets', 
-    value: 52, 
-    color: 'from-blue-500 to-indigo-500',
-    bgColor: 'from-blue-50 to-indigo-50',
-    icon: Database,
-    iconColor: 'text-blue-600'
-  },
-];
-
-/**
- * Status Configuration
+ * Status Configuration matching backend enum/strings
  */
 const STATUS_CONFIG = {
-  Active: {
+  active: {
     color: 'text-green-700',
     bgColor: 'bg-green-100',
     borderColor: 'border-green-200',
-    icon: CheckCircle
+    icon: CheckCircle,
+    label: 'Active'
   },
-  Pending: {
+  processing: {
     color: 'text-amber-700',
     bgColor: 'bg-amber-100',
     borderColor: 'border-amber-200',
-    icon: Clock
+    icon: Clock,
+    label: 'Processing'
   },
-  Error: {
+  archived: {
+    color: 'text-gray-700',
+    bgColor: 'bg-gray-100',
+    borderColor: 'border-gray-200',
+    icon: Archive,
+    label: 'Archived'
+  },
+  error: {
     color: 'text-red-700',
     bgColor: 'bg-red-100',
     borderColor: 'border-red-200',
-    icon: AlertCircle
+    icon: AlertCircle,
+    label: 'Error'
   },
 };
 
-/**
- * ManageDatasets Component
- * Admin interface for managing legal datasets
- * 
- * Features:
- * - Dataset listing with CRUD operations
- * - Validation status overview
- * - Upload new datasets
- * - Responsive design
- * - Theme-matched styling
- * 
- * Optimizations:
- * - Memoized calculations
- * - Efficient rendering
- * - Loading states
- * - Smooth animations
- */
+// Utility to format bytes into readable sizes
+const formatBytes = (bytes) => {
+  if (!bytes || bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+// Utility to format dates
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
 export const ManageDatasets = () => {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [datasets, setDatasets] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
 
+  // Modal States
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedDataset, setSelectedDataset] = useState(null);
+
+  // Authentication logic
+  const getAuthToken = () => localStorage.getItem('accessToken') || localStorage.getItem('token') || '';
+
   /**
-   * Calculate total records across all datasets
+   * Fetch both Datasets and Stats from the backend
    */
-  const totalRecords = useMemo(() => {
-    return mockDatasets.reduce((sum, dataset) => sum + dataset.records, 0);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const token = getAuthToken();
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const [datasetsRes, statsRes] = await Promise.all([
+        fetch('http://localhost:5000/api/v1/datasets?limit=50', { headers }),
+        fetch('http://localhost:5000/api/v1/datasets/stats', { headers })
+      ]);
+
+      const datasetsData = await datasetsRes.json();
+      const statsData = await statsRes.json();
+
+      if (datasetsData.status === 'success') {
+        setDatasets(datasetsData.data.datasets);
+      } else {
+        throw new Error(datasetsData.message || 'Failed to fetch datasets');
+      }
+
+      if (statsData.status === 'success') {
+        setStats(statsData.data);
+      }
+
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Connection Error',
+        description: error.message || 'Failed to communicate with the server.',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
-   * Handle dataset actions (edit, delete, view)
+   * Calculate total records
    */
-  const handleAction = async (action, dataset) => {
+  const totalRecords = useMemo(() => {
+    return stats?.overview?.totalRecords || datasets.reduce((sum, d) => sum + (parseInt(d.recordCount) || 0), 0);
+  }, [datasets, stats]);
+
+  /**
+   * Dynamic Validation Statistics Data
+   */
+  const validationStats = [
+    { 
+      label: 'Active Datasets', 
+      value: stats?.overview?.activeDatasets || 0, 
+      color: 'from-green-500 to-emerald-500',
+      bgColor: 'from-green-50 to-emerald-50',
+      icon: CheckCircle,
+    },
+    { 
+      label: 'Processing', 
+      value: stats?.overview?.processingDatasets || 0, 
+      color: 'from-amber-500 to-yellow-500',
+      bgColor: 'from-amber-50 to-yellow-50',
+      icon: Clock,
+    },
+    { 
+      label: 'Archived', 
+      value: stats?.overview?.archivedDatasets || 0, 
+      color: 'from-gray-500 to-slate-500',
+      bgColor: 'from-gray-50 to-slate-50',
+      icon: Archive,
+    },
+    { 
+      label: 'Total Datasets', 
+      value: stats?.overview?.totalDatasets || 0, 
+      color: 'from-blue-500 to-indigo-500',
+      bgColor: 'from-blue-50 to-indigo-50',
+      icon: Database,
+    },
+  ];
+
+  /**
+   * Handle Dataset Deletion API Call
+   */
+  const handleDeleteConfirm = async () => {
+    if (!selectedDataset) return;
     try {
-      setActionLoading(`${action}-${dataset.id}`);
+      setActionLoading(`delete-${selectedDataset.id}`);
+      const token = getAuthToken();
       
-      // TODO: Implement actual API calls
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: 'Success',
-        description: `Dataset ${action} successfully`,
+      const res = await fetch(`http://localhost:5000/api/v1/datasets/${selectedDataset.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      const data = await res.json();
+      
+      if (data.status === 'success') {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Dataset deleted successfully',
+        });
+        fetchData();
+        setIsDeleteDialogOpen(false);
+        setSelectedDataset(null);
+      } else {
+        throw new Error(data.message);
+      }
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: `Failed to ${action} dataset`,
+        title: 'Delete Failed',
+        description: error.message || 'Failed to delete dataset',
       });
     } finally {
       setActionLoading(null);
@@ -370,24 +230,75 @@ export const ManageDatasets = () => {
   };
 
   /**
-   * Handle refresh
+   * Handle dataset actions (edit, delete, view, archive)
    */
-  const handleRefresh = async () => {
-    setLoading(true);
-    // TODO: Implement actual API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setLoading(false);
+  const handleAction = async (action, dataset) => {
+    // Open appropriate modal based on action
+    if (action === 'view') {
+      setSelectedDataset(dataset);
+      setIsDetailsModalOpen(true);
+      return;
+    }
+    
+    if (action === 'edit') {
+      setSelectedDataset(dataset);
+      setIsUpdateModalOpen(true);
+      return;
+    }
+
+    if (action === 'delete') {
+      setSelectedDataset(dataset);
+      setIsDeleteDialogOpen(true);
+      return;
+    }
+
+    // Handle immediate direct API calls (e.g. archiving)
+    try {
+      setActionLoading(`${action}-${dataset.id}`);
+      const token = getAuthToken();
+      let url = `http://localhost:5000/api/v1/datasets/${dataset.id}`;
+      let method = 'GET';
+
+      if (action === 'archive') {
+        url = `http://localhost:5000/api/v1/datasets/${dataset.id}/archive`;
+        method = 'PATCH';
+      }
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      const data = await res.json();
+      
+      if (data.status === 'success') {
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: `Dataset ${action}d successfully`,
+        });
+        fetchData(); 
+      } else {
+        throw new Error(data.message);
+      }
+
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Action Failed',
+        description: error.message || `Failed to ${action} dataset`,
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  }; 
+
+  const handleRefresh = () => {
+    fetchData();
   };
 
-  /**
-   * Handle upload
-   */
   const handleUpload = () => {
-    // TODO: Implement upload modal
-    toast({
-      title: 'Upload Dataset',
-      description: 'Upload feature coming soon',
-    });
+    setIsUploadModalOpen(true);
   };
 
   return (
@@ -441,7 +352,6 @@ export const ManageDatasets = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {validationStats.map((stat, index) => {
           const Icon = stat.icon;
-          
           return (
             <Card 
               key={index}
@@ -453,7 +363,6 @@ export const ManageDatasets = () => {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-indigo-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
               <div className="relative flex items-center justify-between">
                 <div>
                   <h3 
@@ -463,7 +372,7 @@ export const ManageDatasets = () => {
                     )}
                     style={{ fontFamily: "Poppins" }}
                   >
-                    {stat.value}
+                    {loading ? '-' : stat.value}
                   </h3>
                   <p 
                     className="text-xs font-bold text-gray-600 uppercase tracking-wider mt-2" 
@@ -472,7 +381,6 @@ export const ManageDatasets = () => {
                     {stat.label}
                   </p>
                 </div>
-                
                 <div className={cn(
                   "relative p-3 rounded-xl shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-500",
                   `bg-gradient-to-br ${stat.color}`
@@ -481,8 +389,6 @@ export const ManageDatasets = () => {
                   <div className="absolute inset-0 bg-white/20 rounded-xl animate-pulse" />
                 </div>
               </div>
-              
-              {/* Bottom decorative bar */}
               <div className={cn(
                 "absolute bottom-0 left-0 right-0 h-1 transition-all duration-500",
                 `bg-gradient-to-r ${stat.color}`,
@@ -505,7 +411,7 @@ export const ManageDatasets = () => {
                 All Datasets
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1" style={{ fontFamily: "Inter" }}>
-                Total {totalRecords.toLocaleString()} records across {mockDatasets.length} datasets
+                Total {totalRecords.toLocaleString()} records across {datasets.length} datasets
               </p>
             </div>
           </div>
@@ -525,7 +431,14 @@ export const ManageDatasets = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockDatasets.length === 0 ? (
+                {loading && datasets.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-12">
+                       <RefreshCw className="h-8 w-8 animate-spin mx-auto text-blue-500" />
+                       <p className="text-gray-500 mt-2 font-semibold">Loading datasets...</p>
+                    </TableCell>
+                  </TableRow>
+                ) : datasets.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
@@ -537,8 +450,9 @@ export const ManageDatasets = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  mockDatasets.map((dataset, index) => {
-                    const statusConfig = STATUS_CONFIG[dataset.status];
+                  datasets.map((dataset, index) => {
+                    const dsStatus = dataset.status?.toLowerCase() || 'error';
+                    const statusConfig = STATUS_CONFIG[dsStatus] || STATUS_CONFIG.error;
                     const StatusIcon = statusConfig.icon;
 
                     return (
@@ -554,25 +468,25 @@ export const ManageDatasets = () => {
                             </div>
                             <div>
                               <p className="font-bold text-gray-800 text-sm" style={{ fontFamily: "Poppins" }}>
-                                {dataset.title}
+                                {dataset.name}
                               </p>
                               <p className="text-xs text-gray-500" style={{ fontFamily: "Inter" }}>
-                                {dataset.records} records
+                                {dataset.recordCount || 0} records
                               </p>
                             </div>
                           </div>
                         </TableCell>
                         
                         <TableCell className="text-gray-600 text-sm hidden lg:table-cell" style={{ fontFamily: "Inter" }}>
-                          {dataset.description}
+                          <span className="line-clamp-2">{dataset.description || 'No description provided'}</span>
                         </TableCell>
                         
                         <TableCell className="text-gray-600 text-sm" style={{ fontFamily: "Inter" }}>
-                          {dataset.lastUpdated}
+                          {formatDate(dataset.updatedAt || dataset.createdAt)}
                         </TableCell>
                         
                         <TableCell className="text-gray-600 text-sm hidden md:table-cell font-medium" style={{ fontFamily: "Inter" }}>
-                          {dataset.size}
+                          {formatBytes(dataset.fileSize)}
                         </TableCell>
                         
                         <TableCell>
@@ -586,7 +500,7 @@ export const ManageDatasets = () => {
                             style={{ fontFamily: "Inter" }}
                           >
                             <StatusIcon className="h-3 w-3" />
-                            {dataset.status}
+                            {statusConfig.label}
                           </Badge>
                         </TableCell>
                         
@@ -647,6 +561,51 @@ export const ManageDatasets = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* --- INTEGRATED MODALS --- */}
+      
+      <UploadDatasetModal 
+        open={isUploadModalOpen} 
+        setOpen={setIsUploadModalOpen} 
+        onSuccess={() => { 
+          setIsUploadModalOpen(false); 
+          fetchData(); 
+        }} 
+      />
+
+      <UpdateDatasetModal 
+        open={isUpdateModalOpen} 
+        onClose={() => { 
+          setIsUpdateModalOpen(false); 
+          setSelectedDataset(null); 
+        }} 
+        dataset={selectedDataset} 
+        onSuccess={() => { 
+          setIsUpdateModalOpen(false); 
+          setSelectedDataset(null); 
+          fetchData(); 
+        }} 
+      />
+
+      <DatasetDetailsModal 
+        open={isDetailsModalOpen} 
+        onClose={() => { 
+          setIsDetailsModalOpen(false); 
+          setSelectedDataset(null); 
+        }} 
+        dataset={selectedDataset} 
+      />
+
+      <DeleteConfirmationDialog 
+        open={isDeleteDialogOpen} 
+        onClose={() => { 
+          setIsDeleteDialogOpen(false); 
+          setSelectedDataset(null); 
+        }} 
+        onConfirm={handleDeleteConfirm} 
+        datasetName={selectedDataset?.name} 
+      />
+      
     </div>
   );
 };
