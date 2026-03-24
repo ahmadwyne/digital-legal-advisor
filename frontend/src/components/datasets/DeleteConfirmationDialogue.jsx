@@ -122,7 +122,7 @@ export const DeleteConfirmationDialog = ({ open, onClose, onConfirm, datasetName
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
             <div
-                className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-red-100 w-full max-w-md animate-in zoom-in-95 duration-300"
+                className="admin-modal bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-red-100 w-full max-w-md animate-in zoom-in-95 duration-300"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}

@@ -73,7 +73,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
       <aside
         className={cn(
           // Base styles - ✅ FIXED: Changed to flex column layout
-          'fixed left-0 top-20 bottom-0 w-64 z-[48] transition-all duration-500 ease-out',
+          'admin-sidebar fixed left-0 top-20 bottom-0 w-64 z-[48] transition-all duration-500 ease-out',
           'flex flex-col',  // ✅ NEW: Flex layout to prevent overlap
           
           // Gradient background with glass effect
@@ -184,7 +184,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
         </nav>
 
         {/* Sidebar Footer - ✅ FIXED: Static position at bottom */}
-        <div className="flex-shrink-0 p-2 border-t-2 border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="flex-shrink-0 p-2 border-t-2 border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 admin-sidebar-footer">
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-sm" style={{ fontFamily: "Poppins" }}>

@@ -731,7 +731,7 @@ export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
             onClick={(e) => { if (e.target === e.currentTarget && !loading) handleClose(); }}
         >
             <div 
-                className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-blue-100 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300"
+                className="admin-modal bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-blue-100 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}

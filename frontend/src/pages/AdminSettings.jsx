@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Phone, User, Save, ArrowLeft } from "lucide-react";
+import { Mail, Phone, User, Save, ArrowLeft, Moon, Sun } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import LogoSpinner from "@/components/ui/LogoSpinner";
 import { userApi } from "@/api/userApi";
 import { useToast } from "@/hooks/use-toast.js";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminTheme } from "@/hooks/useAdminTheme";
 
 const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
@@ -22,6 +24,7 @@ const AdminSettings = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { updateUser } = useAuth();
+  const { theme, toggleTheme } = useAdminTheme();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -136,6 +139,28 @@ const AdminSettings = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
+          <div className="mb-6 rounded-2xl border-2 border-blue-100 bg-white/80 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold text-gray-800" style={{ fontFamily: "Inter" }}>
+                  Appearance
+                </p>
+                <p className="text-xs text-gray-500" style={{ fontFamily: "Inter" }}>
+                  Toggle between light and dark mode for the admin panel.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Sun className="h-4 w-4 text-amber-500" />
+                <Switch
+                  checked={theme === "dark"}
+                  onCheckedChange={toggleTheme}
+                  aria-label="Toggle admin dark mode"
+                  className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-slate-300"
+                />
+                <Moon className="h-4 w-4 text-blue-600" />
+              </div>
+            </div>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
