@@ -181,12 +181,18 @@ export const Navbar = ({ onMenuClick }) => {
                   My Account
                 </DropdownMenuLabel>
                 
-                <DropdownMenuItem className="cursor-pointer hover:bg-blue-50 rounded-lg transition-colors duration-300 mx-1 px-3 py-2.5">
+                <DropdownMenuItem
+                  onClick={() => navigate('/admin/profile')}
+                  className="cursor-pointer hover:bg-blue-50 rounded-lg transition-colors duration-300 mx-1 px-3 py-2.5"
+                >
                   <User className="mr-3 h-4 w-4 text-blue-600" />
                   <span style={{ fontFamily: "Inter" }} className="font-medium">Profile</span>
                 </DropdownMenuItem>
                 
-                <DropdownMenuItem className="cursor-pointer hover:bg-blue-50 rounded-lg transition-colors duration-300 mx-1 px-3 py-2.5">
+                <DropdownMenuItem
+                  onClick={() => navigate('/admin/settings')}
+                  className="cursor-pointer hover:bg-blue-50 rounded-lg transition-colors duration-300 mx-1 px-3 py-2.5"
+                >
                   <Settings className="mr-3 h-4 w-4 text-blue-600" />
                   <span style={{ fontFamily: "Inter" }} className="font-medium">Settings</span>
                 </DropdownMenuItem>

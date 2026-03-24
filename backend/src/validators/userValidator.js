@@ -63,6 +63,23 @@ const userValidators = {
       .isIn(['user', 'lawyer', 'admin']).withMessage('Invalid role')
   ],
 
+  // Validate current user profile update
+  updateMyProfile: [
+    body('firstName')
+      .optional({ checkFalsy: true })
+      .trim()
+      .isLength({ min: 2, max: 50 }).withMessage('First name must be 2-50 characters'),
+
+    body('lastName')
+      .optional({ checkFalsy: true })
+      .trim()
+      .isLength({ min: 2, max: 50 }).withMessage('Last name must be 2-50 characters'),
+
+    body('phoneNumber')
+      .optional({ checkFalsy: true })
+      .isMobilePhone().withMessage('Must be a valid phone number')
+  ],
+
   // Validate user ID parameter
   userId: [
     param('id')
