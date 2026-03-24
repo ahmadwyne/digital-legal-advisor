@@ -444,6 +444,7 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
+ 
   /* Enhanced Gradient Background */
   .gradient-bg-enhanced {
     background:
@@ -734,8 +735,8 @@
 
   /* Base animation - slow and smooth */
   .scroll-animate {
-    opacity: 0;
-    transform: translateY(60px);
+    opacity: 1;
+    transform: translateY(none);
     transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
       transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
