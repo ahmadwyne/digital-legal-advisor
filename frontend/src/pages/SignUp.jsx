@@ -1,12 +1,35 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo, lazy, Suspense } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Scale, ArrowRight, Shield, Zap } from "lucide-react";
-import Header from "@/components/Header";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { authApi } from "@/api/authApi";
-import { showToast, validationMessages } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 import { getErrorMessage } from "@/utils/errorHandler";
+
+// Lazy load Header
+const Header = lazy(() => import("@/components/Header"));
+
+// Loading fallback
+const LoadingFallback = () => (
+  <div className="w-full h-20 bg-gradient-to-r from-blue-50 to-indigo-50 animate-pulse" />
+);
+
+// Memoized feature card
+const FeatureCard = ({ feature, idx }) => (
+  <div
+    className="group flex items-start gap-3 p-3 glass-effect rounded-2xl border-2 border-white/50 hover:border-blue-300 shadow-lg hover:shadow-xl transition-all duration-700 hover:-translate-y-1 animate-slide-up"
+    style={{ animationDelay: `${idx * 150}ms`, willChange: 'transform, opacity' }}
+  >
+    <div className={`w-10 h-10 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-700`}>
+      <feature.icon className="w-5 h-5 text-white" strokeWidth={2.5} />
+    </div>
+    <div>
+      <h3 className="text-base font-bold text-gray-800 mb-0.5" style={{ fontFamily: "Poppins" }}>{feature.title}</h3>
+      <p className="text-sm text-gray-600" style={{ fontFamily: "Inter" }}>{feature.desc}</p>
+    </div>
+  </div>
+);
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -25,14 +48,21 @@ const SignUp = () => {
 
   useAuthRedirect('/platform');
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // Memoize features
+  const features = useMemo(() => [
+    { icon: Shield, title: "Secure Account", desc: "Your data is protected with 256-bit encryption", color: "from-blue-500 to-indigo-600" },
+    { icon: Zap, title: "Instant Access", desc: "Get immediate legal guidance powered by AI", color: "from-amber-500 to-orange-600" },
+    { icon: Scale, title: "Expert Accuracy", desc: "Trained on Pakistani financial laws", color: "from-indigo-500 to-purple-600" }
+  ], []);
 
-  const handleSubmit = async (e) => {
+  const handleChange = useCallback((e) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  }, []);
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     const { firstName, lastName, email, password, confirmPassword } = formData;
 
@@ -68,25 +98,27 @@ const SignUp = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [formData, register, navigate]);
 
-  const handleGoogleSignUp = () => {
+  const handleGoogleSignUp = useCallback(() => {
     authApi.googleLogin();
-  };
+  }, []);
+
+  const togglePassword = useCallback(() => setShowPassword(prev => !prev), []);
+  const toggleConfirmPassword = useCallback(() => setShowConfirmPassword(prev => !prev), []);
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <Header />
+      <Suspense fallback={<LoadingFallback />}>
+        <Header />
+      </Suspense>
 
-      {/* Animated Background - Identical to Login */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden select-none">
+      {/* Optimized Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden select-none" style={{ willChange: 'transform' }}>
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(59, 130, 246, 0.4) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(59, 130, 246, 0.4) 1px, transparent 1px)
-            `,
+            backgroundImage: `linear-gradient(to right, rgba(59, 130, 246, 0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(59, 130, 246, 0.4) 1px, transparent 1px)`,
             backgroundSize: "60px 60px",
           }}
         ></div>
@@ -99,7 +131,7 @@ const SignUp = () => {
         <div className="max-w-6xl mx-auto h-full flex items-center justify-center">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full">
             
-            {/* LEFT SIDE - Welcome Section (Matched to Login) */}
+            {/* LEFT SIDE */}
             <div className="hidden lg:block animate-fade-in">
               <div className="space-y-6 max-w-md">
                 <div>
@@ -112,20 +144,8 @@ const SignUp = () => {
                 </div>
 
                 <div className="space-y-3">
-                  {[
-                    { icon: Shield, title: "Secure Account", desc: "Your data is protected with 256-bit encryption", color: "from-blue-500 to-indigo-600" },
-                    { icon: Zap, title: "Instant Access", desc: "Get immediate legal guidance powered by AI", color: "from-amber-500 to-orange-600" },
-                    { icon: Scale, title: "Expert Accuracy", desc: "Trained on Pakistani financial laws", color: "from-indigo-500 to-purple-600" }
-                  ].map((feature, idx) => (
-                    <div key={idx} className="group flex items-start gap-3 p-3 glass-effect rounded-2xl border-2 border-white/50 hover:border-blue-300 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1 animate-slide-up" style={{ animationDelay: `${idx * 100}ms` }}>
-                      <div className={`w-10 h-10 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-500`}>
-                        <feature.icon className="w-5 h-5 text-white" strokeWidth={2.5} />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-gray-800 mb-0.5" style={{ fontFamily: "Poppins" }}>{feature.title}</h3>
-                        <p className="text-sm text-gray-600" style={{ fontFamily: "Inter" }}>{feature.desc}</p>
-                      </div>
-                    </div>
+                  {features.map((feature, idx) => (
+                    <FeatureCard key={idx} feature={feature} idx={idx} />
                   ))}
                 </div>
               </div>
@@ -134,8 +154,6 @@ const SignUp = () => {
             {/* RIGHT SIDE - Sign Up Form */}
             <div className="w-full max-w-lg mx-auto lg:mx-0 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
               <div className="glass-effect p-6 sm:p-7 rounded-[2.5rem] shadow-2xl border-2 border-white/50 backdrop-blur-xl">
-                
-
                 <form onSubmit={handleSubmit} className="space-y-2">
                   {/* First & Last Name Grid */}
                   <div className="grid grid-cols-2 gap-4">
@@ -149,6 +167,7 @@ const SignUp = () => {
                         className="w-full px-4 py-2 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all text-gray-800 placeholder-gray-400 hover:border-gray-300"
                         placeholder="John"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                     <div>
@@ -161,6 +180,7 @@ const SignUp = () => {
                         className="w-full px-4 py-2 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all text-gray-800 placeholder-gray-400 hover:border-gray-300"
                         placeholder="Smith"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -176,6 +196,7 @@ const SignUp = () => {
                       className="w-full px-4 py-2 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all text-gray-800 placeholder-gray-400 hover:border-gray-300"
                       placeholder="you@example.com"
                       required
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -191,8 +212,9 @@ const SignUp = () => {
                         className="w-full px-4 py-2 pr-10 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all text-gray-800 text-sm"
                         placeholder="••••••"
                         required
+                        disabled={isLoading}
                       />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-[38px] text-gray-400 hover:text-blue-600">
+                      <button type="button" onClick={togglePassword} className="absolute right-3 top-[38px] text-gray-400 hover:text-blue-600" disabled={isLoading} aria-label="Toggle password visibility">
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
@@ -206,38 +228,49 @@ const SignUp = () => {
                         className="w-full px-4 py-2 pr-10 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all text-gray-800 text-sm"
                         placeholder="••••••"
                         required
+                        disabled={isLoading}
                       />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-[38px] text-gray-400 hover:text-blue-600">
+                      <button type="button" onClick={toggleConfirmPassword} className="absolute right-3 top-[38px] text-gray-400 hover:text-blue-600" disabled={isLoading} aria-label="Toggle confirm password visibility">
                         {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
 
-                  {/* Sign Up Button - 75% width & Centered */}
+                  {/* Sign Up Button */}
                   <button
                     type="submit"
-                    className="group relative w-[65%] mx-auto flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl text-base font-bold hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl transition-all duration-300 disabled:opacity-50 shadow-lg overflow-hidden !mt-8"
+                    className="group relative w-[65%] mx-auto flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl text-base font-bold hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl transition-all duration-500 disabled:opacity-50 shadow-lg overflow-hidden !mt-8"
                     disabled={isLoading}
+                    style={{ fontFamily: "Inter" }}
                   >
                     <span className="relative z-10 flex items-center gap-2">
-                      {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign Up"}
-                      {!isLoading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        <>
+                          Sign Up
+                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-500" />
+                        </>
+                      )}
                     </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1500"></div>
                   </button>
                 </form>
 
                 <div className="flex items-center my-3">
-                  <div className="flex-1 border-t-2 border-blue-600"></div>
+                  <div className="flex-1 border-t-2 border-gray-200"></div>
                   <span className="px-3 text-gray-400 text-xs font-bold uppercase tracking-wider" style={{ fontFamily: "Inter" }}>OR</span>
-                  <div className="flex-1 border-t-2 border-blue-600"></div>
+                  <div className="flex-1 border-t-2 border-gray-200"></div>
                 </div>
 
-                {/* Google Button - 75% width & Centered */}
+                {/* Google Button */}
                 <button
                   onClick={handleGoogleSignUp}
                   type="button"
-                  className="w-[65%] mx-auto bg-white border-2 border-gray-200 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-3 shadow-sm"
+                  className="w-[65%] mx-auto bg-white border-2 border-gray-200 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all duration-500 flex items-center justify-center gap-3 shadow-sm"
                   disabled={isLoading}
                 >
                   <img src="/google-logo.png" alt="Google" className="w-4 h-4" />
@@ -246,7 +279,7 @@ const SignUp = () => {
 
                 <p className="text-center text-sm text-gray-600 mt-4" style={{ fontFamily: "Inter" }}>
                   Already have an account?{' '}
-                  <Link to="/login" className="text-blue-600 font-bold hover:text-blue-700 hover:underline transition-colors">
+                  <Link to="/login" className="text-blue-600 font-bold hover:text-blue-700 hover:underline transition-colors duration-300">
                     Sign In
                   </Link>
                 </p>
