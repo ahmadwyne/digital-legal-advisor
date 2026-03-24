@@ -32,7 +32,7 @@ export const Navbar = ({ onMenuClick }) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl shadow-lg border-b-2 border-blue-100/50 h-20 transition-all duration-500">
+    <nav className="admin-navbar fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl shadow-lg border-b-2 border-blue-100/50 h-20 transition-all duration-500">
       <div className="w-full px-6 sm:px-8 lg:px-12 xl:px-16 h-full">
         <div className="flex items-center justify-between h-full">
           

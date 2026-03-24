@@ -15,8 +15,7 @@ const LogoSpinner = ({ size = 56, className }) => {
       aria-label="Loading"
       role="status"
     >
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-700 to-blue-500 shadow-xl animate-spin" />
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/25 to-transparent animate-shimmer" />
+      <div className="admin-spinner absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 shadow-xl animate-spin" />
       <Scale className="relative text-white" style={{ width: iconSize, height: iconSize }} />
     </div>
   );

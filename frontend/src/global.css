@@ -165,6 +165,196 @@
   }
 
   /* ===================================
+   ADMIN DARK MODE OVERRIDES
+   =================================== */
+
+  .admin-dark {
+    color-scheme: dark;
+  }
+
+  .admin-dark .admin-shell {
+    background: linear-gradient(135deg, #0b1220 0%, #141c2f 100%);
+  }
+
+  .admin-dark .admin-navbar {
+    background: rgba(11, 18, 32, 0.92) !important;
+    border-color: rgba(20, 28, 47, 0.9) !important;
+    box-shadow: 0 12px 30px -16px rgba(15, 23, 42, 0.9) !important;
+  }
+
+  .admin-dark .admin-sidebar {
+    background: linear-gradient(180deg, rgba(11, 18, 32, 0.98), rgba(20, 28, 47, 0.98)) !important;
+    border-color: rgba(20, 28, 47, 0.9) !important;
+    box-shadow: 20px 0 50px -40px rgba(15, 23, 42, 0.9) !important;
+  }
+
+  .admin-dark .admin-content {
+    color: #e2e8f0;
+  }
+
+  .admin-dark .admin-content .bg-white,
+  .admin-dark .admin-content .bg-white\/80,
+  .admin-dark .admin-content .bg-white\/95 {
+    background-color: rgba(11, 18, 32, 0.92) !important;
+  }
+
+  .admin-dark .admin-content .bg-blue-50,
+  .admin-dark .admin-content .bg-blue-50\/50,
+  .admin-dark .admin-content .bg-blue-50\/30,
+  .admin-dark .admin-content .bg-gradient-to-r,
+  .admin-dark .admin-content .bg-gradient-to-br {
+    background-color: rgba(20, 28, 47, 0.85) !important;
+    background-image: linear-gradient(135deg, #0b1220 0%, #141c2f 100%) !important;
+  }
+
+  .admin-dark .admin-content .border-blue-100,
+  .admin-dark .admin-content .border-blue-100\/50,
+  .admin-dark .admin-content .border-blue-200 {
+    border-color: rgba(32, 45, 74, 0.9) !important;
+  }
+
+  .admin-dark .admin-content .text-gray-800,
+  .admin-dark .admin-content .text-gray-700 {
+    color: #e2e8f0 !important;
+  }
+
+  .admin-dark .admin-content .text-black,
+  .admin-dark .admin-content .text-gray-900 {
+    color: #f8fafc !important;
+  }
+
+  .admin-dark .admin-content h1,
+  .admin-dark .admin-content h2,
+  .admin-dark .admin-content h3,
+  .admin-dark .admin-content h4,
+  .admin-dark .admin-content h5,
+  .admin-dark .admin-content h6 {
+    color: #f8fafc !important;
+  }
+
+  .admin-dark .admin-content .text-gray-600,
+  .admin-dark .admin-content .text-gray-500,
+  .admin-dark .admin-content .text-gray-400 {
+    color: #94a3b8 !important;
+  }
+
+  .admin-dark .admin-content .bg-green-50,
+  .admin-dark .admin-content .bg-amber-50,
+  .admin-dark .admin-content .bg-yellow-50,
+  .admin-dark .admin-content .bg-red-50,
+  .admin-dark .admin-content .bg-emerald-50 {
+    background-color: rgba(20, 28, 47, 0.9) !important;
+  }
+
+  .admin-dark .admin-content .border-green-100,
+  .admin-dark .admin-content .border-amber-100,
+  .admin-dark .admin-content .border-yellow-100,
+  .admin-dark .admin-content .border-red-100,
+  .admin-dark .admin-content .border-emerald-100 {
+    border-color: rgba(32, 45, 74, 0.9) !important;
+  }
+
+  .admin-dark .admin-sidebar-footer a {
+    color: #cbd5f5 !important;
+  }
+
+  .admin-dark .admin-sidebar-footer a:hover {
+    color: #e2e8f0 !important;
+  }
+
+  .admin-dark .admin-sidebar .text-gray-700,
+  .admin-dark .admin-sidebar .text-gray-500 {
+    color: #cbd5f5 !important;
+  }
+
+  .admin-dark .admin-sidebar-footer {
+    background: linear-gradient(180deg, rgba(11, 18, 32, 0.98), rgba(20, 28, 47, 0.98)) !important;
+    border-color: rgba(20, 28, 47, 0.9) !important;
+  }
+
+  .admin-dark .admin-navbar .text-gray-800,
+  .admin-dark .admin-navbar .text-gray-700,
+  .admin-dark .admin-navbar .text-gray-600 {
+    color: #e2e8f0 !important;
+  }
+
+  .admin-dark .admin-navbar .bg-gradient-to-r.from-red-50,
+  .admin-dark .admin-navbar .bg-gradient-to-r.from-red-100 {
+    background: rgba(20, 28, 47, 0.9) !important;
+    border-color: rgba(32, 45, 74, 0.9) !important;
+  }
+
+  .admin-dark .admin-modal {
+    background-color: rgba(11, 18, 32, 0.96) !important;
+    border-color: rgba(32, 45, 74, 0.9) !important;
+    color: #e2e8f0;
+  }
+
+  .admin-dark .admin-modal .bg-white,
+  .admin-dark .admin-modal .bg-blue-50,
+  .admin-dark .admin-modal .bg-blue-50\/50,
+  .admin-dark .admin-modal .bg-red-50 {
+    background-color: rgba(20, 28, 47, 0.9) !important;
+  }
+
+  .admin-dark .admin-modal .text-gray-900,
+  .admin-dark .admin-modal .text-gray-800,
+  .admin-dark .admin-modal .text-gray-700 {
+    color: #f8fafc !important;
+  }
+
+  .admin-dark .admin-modal .text-gray-600,
+  .admin-dark .admin-modal .text-gray-500,
+  .admin-dark .admin-modal .text-gray-400 {
+    color: #94a3b8 !important;
+  }
+
+  .admin-dark .admin-modal .border-blue-100,
+  .admin-dark .admin-modal .border-blue-200,
+  .admin-dark .admin-modal .border-red-100,
+  .admin-dark .admin-modal .border-gray-200 {
+    border-color: rgba(32, 45, 74, 0.9) !important;
+  }
+
+  .admin-dark .admin-modal input,
+  .admin-dark .admin-modal textarea,
+  .admin-dark .admin-modal select {
+    background-color: rgba(11, 18, 32, 0.96) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(32, 45, 74, 0.9) !important;
+  }
+
+  .admin-dark .admin-content input,
+  .admin-dark .admin-content textarea,
+  .admin-dark .admin-content select {
+    background-color: rgba(11, 18, 32, 0.92) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(32, 45, 74, 0.9) !important;
+  }
+
+  .admin-dark .admin-content input::placeholder,
+  .admin-dark .admin-content textarea::placeholder {
+    color: #64748b !important;
+  }
+
+  .admin-dark .admin-content .shadow-lg,
+  .admin-dark .admin-content .shadow-xl,
+  .admin-dark .admin-content .shadow-2xl {
+    box-shadow: 0 20px 40px -28px rgba(3, 7, 18, 0.9) !important;
+  }
+
+  .admin-dark .admin-content .bg-gradient-to-r.from-blue-600,
+  .admin-dark .admin-content .bg-gradient-to-r.from-blue-700,
+  .admin-dark .admin-content .bg-gradient-to-br.from-blue-600,
+  .admin-dark .admin-content .bg-gradient-to-br.from-blue-700 {
+    background-image: linear-gradient(135deg, #0b1220 0%, #1d2a44 100%) !important;
+  }
+
+  .admin-dark .admin-spinner {
+    background-image: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%) !important;
+  }
+
+  /* ===================================
    ELEGANT DIGITAL LEGAL ADVISOR THEME
    =================================== */
 
