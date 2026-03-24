@@ -4,6 +4,7 @@ const router = express.Router();
 const authRoutes = require("./authRoutes");
 const userRoutes = require("./userRoutes");
 const adminRoutes = require("./adminRoutes");
+const datasetRoutes = require('./datasetRoutes');
 
 // Health check
 router.get("/health", (req, res) => {
@@ -16,5 +17,5 @@ router.get("/health", (req, res) => {
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/admin", adminRoutes);
-
+router.use('/datasets', datasetRoutes);
 module.exports = router;

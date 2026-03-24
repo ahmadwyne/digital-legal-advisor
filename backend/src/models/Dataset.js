@@ -37,8 +37,47 @@ module.exports = (sequelize) => {
 
   }, {
     tableName: 'datasets',
-    timestamps: true
+    timestamps: true,
+    freezeTableName: true,
+    underscored: false, // matches your camelCase columns
+    indexes: [
+      { fields: ['category'] },
+      { fields: ['status'] },
+      { fields: ['uploadedById'] },
+      { fields: ['isDeleted'] },
+      { fields: ['tags'], using: 'gin' }
+    ],
+    hooks: {
+      beforeCreate: (dataset) => {
+        if (dataset.tags) dataset.tags = dataset.tags.map(t => t.toLowerCase().trim());
+      },
+      beforeUpdate: (dataset) => {
+        if (dataset.changed('tags') && dataset.tags) dataset.tags = dataset.tags.map(t => t.toLowerCase().trim());
+      }
+    }
   });
+
+  // Instance methods
+  Dataset.prototype.incrementDownloadCount = async function () {
+    this.downloadCount++;
+    await this.save();
+  };
+
+  Dataset.prototype.incrementQueryCount = async function () {
+    this.queryCount++;
+    await this.save();
+  };
+
+  Dataset.prototype.archive = async function () {
+    this.status = 'archived';
+    this.archivedAt = new Date();
+    await this.save();
+  };
+
+  Dataset.prototype.softDelete = async function () {
+    this.isDeleted = true;
+    await this.save();
+  };
 
   return Dataset;
 };

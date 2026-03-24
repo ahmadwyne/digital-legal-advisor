@@ -11,7 +11,7 @@ const api = axios.create({
 });
 
 // Request interceptor - Add auth token to requests
-api. interceptors.request.use(
+api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
     if (token) {
@@ -25,7 +25,7 @@ api. interceptors.request.use(
 );
 
 // Response interceptor - Handle token refresh
-api.interceptors. response.use(
+api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -37,17 +37,17 @@ api.interceptors. response.use(
       try {
         const refreshToken = getRefreshToken();
         
-        if (! refreshToken) {
+        if (!refreshToken) {
           throw new Error('No refresh token available');
         }
 
         // Try to refresh the token
         const response = await axios.post(
-          `${import.meta.env. VITE_API_URL || 'http://localhost:5000/api/v1'}/auth/refresh-token`,
+          `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/auth/refresh-token`,
           { refreshToken }
         );
 
-        const { token } = response.data. data;
+        const { token } = response.data.data;
         setAccessToken(token);
 
         // Retry the original request with new token

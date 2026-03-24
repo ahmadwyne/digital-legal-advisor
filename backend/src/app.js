@@ -15,7 +15,7 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  origin: process.env. CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true
 }));
 
@@ -25,19 +25,19 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Body parser middleware
-app.use(express. json());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Session configuration (needed for OAuth)
 app.use(session({
-  secret: process.env. SESSION_SECRET || 'your-session-secret',
-  resave:  false,
+  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  resave: false,
   saveUninitialized: false,
   cookie: {
-    secure:  process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge:  24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 
@@ -45,7 +45,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// API routes
+// API routes - this should include dataset routes already
+// DON'T register dataset routes separately here
 app.use(process.env.API_PREFIX || '/api/v1', routes);
 
 // Health check endpoint

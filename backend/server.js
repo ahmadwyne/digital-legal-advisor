@@ -1,6 +1,7 @@
 require('dotenv').config();
 const app = require('./src/app');
 const { sequelize } = require('./src/models');
+const { initializeBucket } = require('./src/utils/SupabaseStorage');
 
 const PORT = process.env.PORT || 5000;
 
@@ -8,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     // Test database connection
-    await sequelize. authenticate();
+    await sequelize.authenticate();
     console.log('✅ Database connection established successfully.');
 
     // Sync database (use { force: true } to drop tables - only in development)
