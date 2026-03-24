@@ -14,6 +14,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ManageDatasets from "./pages/ManageDatasets";
 import  ManageUsers  from "./pages/ManageUsers";
 import FeedbackMonitoring from "./pages/FeedbackMonitoring";
+import AdminProfile from "./pages/AdminProfile";
+import AdminSettings from "./pages/AdminSettings";
 
 // Public Pages
 import LandingPage from "./pages/LandingPage";
@@ -163,6 +165,26 @@ function App() {
                   <RoleBasedRoute allowedRoles={["admin"]}>
                     <MainLayout>
                       <FeedbackMonitoring />
+                    </MainLayout>
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="/admin/profile"
+                element={
+                  <RoleBasedRoute allowedRoles={["admin"]}>
+                    <MainLayout>
+                      <AdminProfile />
+                    </MainLayout>
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="/admin/settings"
+                element={
+                  <RoleBasedRoute allowedRoles={["admin"]}>
+                    <MainLayout>
+                      <AdminSettings />
                     </MainLayout>
                   </RoleBasedRoute>
                 }

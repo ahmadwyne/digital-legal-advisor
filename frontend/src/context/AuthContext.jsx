@@ -92,7 +92,7 @@
 
 import { createContext, useState, useEffect } from 'react';
 import { authApi } from '@/api/authApi';
-import { setTokens, clearTokens, getUser, isAuthenticated } from '@/utils/tokenManager';
+import { setTokens, clearTokens, getUser, isAuthenticated, setUser as persistUser } from '@/utils/tokenManager';
 
 export const AuthContext = createContext(null);
 
@@ -192,7 +192,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = (updatedUser) => {
     setUser(updatedUser);
-    setTokens(null, null, updatedUser);
+    persistUser(updatedUser);
   };
 
   const value = {
