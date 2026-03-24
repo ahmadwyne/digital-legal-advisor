@@ -12,8 +12,8 @@ const startServer = async () => {
     console.log('✅ Database connection established successfully.');
 
     // Sync database (use { force: true } to drop tables - only in development)
-    await sequelize. sync({ alter: true });
-    console.log('✅ Database synchronized successfully.');
+    // await sequelize. sync({ alter: true });
+    // console.log('✅ Database synchronized successfully.');
 
     // Start server
     app.listen(PORT, () => {
