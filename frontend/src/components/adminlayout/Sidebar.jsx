@@ -2,11 +2,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { X, ChevronRight } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import {
   LayoutDashboard,
   Users,
   Database,
   MessageSquare,
+  Settings,
 } from 'lucide-react';
 
 /**
@@ -38,6 +40,12 @@ const navItems = [
     icon: MessageSquare,
     description: 'User Responses',
   },
+  {
+    title: 'Settings',
+    href: '/admin/settings',
+    icon: Settings,
+    description: 'Profile Settings',
+  },
 ];
 
 /**
@@ -48,6 +56,7 @@ const navItems = [
  */
 export const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const { user } = useAuth();
 
   return (
     <>
@@ -183,9 +192,14 @@ export const Sidebar = ({ isOpen, onClose }) => {
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-gray-700 truncate" style={{ fontFamily: "Inter" }}>
-                Admin Panel 
-              </p>
+              <Link
+                to="/admin/profile"
+                onClick={onClose}
+                className="text-xs font-bold text-gray-700 truncate hover:text-blue-700 transition-colors"
+                style={{ fontFamily: "Inter" }}
+              >
+                {user?.firstName || 'Admin'} {user?.lastName || ''}
+              </Link>
               <p className="text-xs text-gray-500 truncate" style={{ fontFamily: "Inter" }}>
                 © 2025 All Rights Reserved
               </p>
