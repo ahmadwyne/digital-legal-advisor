@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { X, Loader2, Mail, ArrowRight } from 'lucide-react';
-import { authApi } from '@/api/authApi';
-import { useToast } from '@/hooks/use-toast';
-import { getErrorMessage } from '@/utils/errorHandler';
+import { useState } from "react";
+import { X, Loader2, Mail, ArrowRight } from "lucide-react";
+import { authApi } from "@/api/authApi";
+import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const ForgotPasswordModal = ({ isOpen, onClose }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
@@ -16,20 +16,20 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
 
     try {
       await authApi.forgotPassword(email);
-      
+
       setIsSuccess(true);
       toast({
-        title: 'Success',
-        description: 'Password reset link sent! Please check your email.',
+        title: "Success",
+        description: "Password reset link sent! Please check your email.",
       });
-      
+
       setTimeout(() => {
         handleClose();
       }, 5000);
     } catch (error) {
       toast({
-        variant: 'destructive',
-        title: 'Error',
+        variant: "destructive",
+        title: "Error",
         description: getErrorMessage(error),
       });
     } finally {
@@ -42,7 +42,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
       onClose();
       // Reset state after animation
       setTimeout(() => {
-        setEmail('');
+        setEmail("");
         setIsSuccess(false);
       }, 300);
     }
@@ -53,7 +53,6 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-blue-900/20 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fade-in">
       <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md relative border-2 border-white overflow-hidden">
-        
         {/* Top Decorative Bar */}
         <div className="h-2 w-full bg-gradient-to-r from-blue-600 to-indigo-600" />
 
@@ -72,15 +71,16 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
               <div className="mb-6">
                 <h2
                   className="text-2xl font-black text-gray-800 mb-2"
-                  style={{ fontFamily: 'Poppins' }}
+                  style={{ fontFamily: "Poppins" }}
                 >
                   Forgot Password?
                 </h2>
                 <p
                   className="text-gray-600 text-sm leading-relaxed"
-                  style={{ fontFamily: 'Inter' }}
+                  style={{ fontFamily: "Inter" }}
                 >
-                  Enter your email address and we'll send you a link to reset your password.
+                  Enter your email address and we'll send you a link to reset
+                  your password.
                 </p>
               </div>
 
@@ -89,7 +89,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                   <label
                     htmlFor="reset-email"
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    style={{ fontFamily: 'Inter' }}
+                    style={{ fontFamily: "Inter" }}
                   >
                     Email Address
                   </label>
@@ -100,7 +100,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 py-3 bg-white border-2 border-gray-100 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all text-gray-800 text-sm placeholder-gray-400"
                     placeholder="you@example.com"
-                    style={{ fontFamily: 'Inter' }}
+                    style={{ fontFamily: "Inter" }}
                     required
                     disabled={isLoading}
                   />
@@ -109,7 +109,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                 <button
                   type="submit"
                   className="group relative w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl text-base font-bold hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg overflow-hidden"
-                  style={{ fontFamily: 'Inter' }}
+                  style={{ fontFamily: "Inter" }}
                   disabled={isLoading}
                 >
                   <span className="relative z-10 flex items-center gap-2">
@@ -136,22 +136,22 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
               </div>
               <h3
                 className="text-2xl font-black text-gray-800 mb-2"
-                style={{ fontFamily: 'Poppins' }}
+                style={{ fontFamily: "Poppins" }}
               >
                 Check Your Email
               </h3>
               <p
                 className="text-gray-600 text-sm px-4"
-                style={{ fontFamily: 'Inter' }}
+                style={{ fontFamily: "Inter" }}
               >
                 We've sent a password reset link to <br />
                 <strong className="text-blue-600">{email}</strong>
               </p>
-              
-              <button 
+
+              <button
                 onClick={handleClose}
                 className="mt-8 text-sm font-bold text-gray-400 hover:text-blue-600 transition-colors"
-                style={{ fontFamily: 'Inter' }}
+                style={{ fontFamily: "Inter" }}
               >
                 Back to Login
               </button>
