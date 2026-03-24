@@ -77,16 +77,19 @@ export const Navbar = ({ onMenuClick }) => {
               </div>
             </Link>
 
-            {/* Admin Badge */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-200 rounded-full">
+            {/* Admin Name Badge */}
+            <Link
+              to="/admin/profile"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-200 rounded-full hover:shadow-sm transition-all"
+            >
               <Shield className="w-4 h-4 text-red-600" />
-              <span 
-                className="text-xs font-bold text-red-700 tracking-wide" 
+              <span
+                className="text-xs font-bold text-red-700 tracking-wide"
                 style={{ fontFamily: "Inter" }}
               >
-                ADMIN PANEL
+                {user?.firstName || 'Admin'} {user?.lastName || ''}
               </span>
-            </div>
+            </Link>
           </div>
 
           {/* Right Section - Actions & User Menu */}
