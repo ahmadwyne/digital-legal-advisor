@@ -104,5 +104,7 @@ export const useDocumentSummarizer = () => {
     handleFeedback,
     handleFeedbackModalSubmit,
     handleReset,
+    setSummary,
+    setError,
   };
 };
