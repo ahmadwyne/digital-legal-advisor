@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
+import {
+  ThumbsUp,
+  ThumbsDown,
+  RefreshCw,
+  FileText,
+  Calendar,
+ FileSignature,
+  Bot,
+} from 'lucide-react';
 
 const SummaryDisplay = ({ summary, onFeedback, onOpenFeedbackModal, onReset }) => {
   const [liked, setLiked] = useState(false);
@@ -24,7 +32,7 @@ const SummaryDisplay = ({ summary, onFeedback, onOpenFeedbackModal, onReset }) =
       <div className="flex items-center justify-between mb-5 lg:mb-6">
         <div className="flex items-center gap-3 lg:gap-4">
           <div className="w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-gradient-to-br from-blue-700 to-blue-500 flex items-center justify-center shadow-md">
-            <span className="text-white text-lg">📄</span>
+            <FileText className="w-5 h-5 text-white" />
           </div>
           <h2 className="text-2xl lg:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Poppins' }}>
             Document Summary
@@ -43,23 +51,18 @@ const SummaryDisplay = ({ summary, onFeedback, onOpenFeedbackModal, onReset }) =
 
       <div className="flex flex-wrap gap-2 mb-5">
         {summary.type && (
-          <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full" style={{ fontFamily: 'Inter' }}>
-            📄 {summary.type}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full" style={{ fontFamily: 'Inter' }}>
+            <FileText className="w-3.5 h-3.5" /> {summary.type}
           </span>
         )}
         {summary.year && (
-          <span className="inline-flex items-center px-3 py-1 bg-white border border-blue-100 text-gray-700 text-xs font-semibold rounded-full" style={{ fontFamily: 'Inter' }}>
-            📅 {summary.year}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-blue-100 text-gray-700 text-xs font-semibold rounded-full" style={{ fontFamily: 'Inter' }}>
+            <Calendar className="w-3.5 h-3.5" /> {summary.year}
           </span>
         )}
         {summary.wordCount && (
-          <span className="inline-flex items-center px-3 py-1 bg-white border border-blue-100 text-gray-700 text-xs font-semibold rounded-full" style={{ fontFamily: 'Inter' }}>
-            📝 {summary.wordCount.toLocaleString()} words
-          </span>
-        )}
-        {summary.method && (
-          <span className="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold rounded-full" style={{ fontFamily: 'Inter' }}>
-            🤖 {summary.method}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-blue-100 text-gray-700 text-xs font-semibold rounded-full" style={{ fontFamily: 'Inter' }}>
+            <FileSignature className="w-3.5 h-3.5" /> {summary.wordCount.toLocaleString()} words
           </span>
         )}
       </div>
