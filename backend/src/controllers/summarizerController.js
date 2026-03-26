@@ -1,5 +1,7 @@
 const { summarizeDocument } = require('../services/summarizerService');
 const { createFeedback } = require('../services/feedbackService');
+const { saveSummaryRecord, getUserSummaryHistory } = require('../services/documentSummaryService');
+const { ActivityLog } = require('../models');
 
 /**
  * POST /api/v1/summarizer/summarize
@@ -25,10 +27,25 @@ const summarize = async (req, res, next) => {
     }
 
     const result = await summarizeDocument(buffer, mimetype, originalname);
+    
+    const userId = req.user?.id;
+    const ext = (originalname.split('.').pop() || '').toLowerCase();
+
+    const savedRow = await saveSummaryRecord({
+    userId,
+    fileName: originalname,
+    fileType: ext || mimetype,
+    summaryResult: result,
+    isValid: true
+    });
 
     return res.status(200).json({
-      status: 'success',
-      data: result,
+        status: 'success',
+        data: {
+            ...result,
+            historyId: savedRow.id,
+            documentId: savedRow.documentId
+        },
     });
   } catch (error) {
     console.error('[SummarizerController] Error:', error.message);
@@ -60,6 +77,13 @@ const submitFeedback = async (req, res, next) => {
       metadata: { documentName, summarySnippet },
     });
 
+    await ActivityLog.create({
+    userId,
+    eventType: 'Document Summary Feedback Submitted',
+    severity: 'info',
+    details: `Feedback submitted (${rating}) for summarizer`
+    });
+
     return res.status(201).json({
       status: 'success',
       message: 'Feedback submitted successfully.',
@@ -71,4 +95,21 @@ const submitFeedback = async (req, res, next) => {
   }
 };
 
-module.exports = { summarize, submitFeedback };
+const getSummaryHistory = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+    const limit = Number(req.query.limit || 20);
+    const offset = Number(req.query.offset || 0);
+
+    const data = await getUserSummaryHistory({ userId, limit, offset });
+
+    return res.status(200).json({
+      status: 'success',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { summarize, submitFeedback, getSummaryHistory };

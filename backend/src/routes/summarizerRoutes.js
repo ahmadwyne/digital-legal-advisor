@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { summarize, submitFeedback } = require('../controllers/summarizerController');
+const { summarize, submitFeedback, getSummaryHistory } = require('../controllers/summarizerController');
 const { protect  } = require('../middlewares/authMiddleware');
 
 // Multer: store in memory (no disk writes needed — we parse buffer directly)
@@ -33,5 +33,6 @@ router.post('/summarize', protect , upload.single('document'), summarize);
 
 // POST /api/v1/summarizer/feedback
 router.post('/feedback', protect , submitFeedback);
+router.get('/history', protect, getSummaryHistory);
 
 module.exports = router;
