@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Send,
   Plus,
@@ -226,7 +226,8 @@ const Platform = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef(null);
   const messageContainerRef = useRef(null);
-
+  const navigate = useNavigate();
+  const location = useLocation();
   const [chatSessions, setChatSessions] = useState([
     {
       id: "1",
@@ -381,6 +382,13 @@ const Platform = () => {
   const filteredSessions = chatSessions.filter((session) =>
     session.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // inside Platform component (replace existing nav tabs map block)
+  const tabs = [
+    { label: "Chat", icon: MessageCircle, path: "/platform" },
+    { label: "Summarizer", icon: FileText, path: "/document-summarizer" },
+    { label: "Precedents", icon: BookOpen, path: "/legal-precedents" },
+  ];
 
   return (
     <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
@@ -548,7 +556,7 @@ const Platform = () => {
           </div>
 
           {/* Center: Navigation tabs */}
-          <nav className="flex items-center gap-1 flex-1 justify-center">
+          {/* <nav className="flex items-center gap-1 flex-1 justify-center">
             {[
               { label: "Chat", icon: MessageCircle },
               { label: "Summarizer", icon: FileText },
@@ -567,6 +575,27 @@ const Platform = () => {
                 <span>{label}</span>
               </button>
             ))}
+          </nav> */}
+
+          <nav className="flex items-center gap-1 flex-1 justify-center">
+            {tabs.map(({ label, icon: Icon, path }) => {
+              const isActive = location.pathname === path;
+              return (
+                <button
+                  key={label}
+                  onClick={() => navigate(path)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 group whitespace-nowrap
+                    ${isActive
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-400/30 hover:bg-blue-700"
+                      : "text-gray-600 hover:text-blue-700 hover:bg-blue-50"
+                    }`}
+                  style={{ fontFamily: "Inter" }}
+                >
+                  <Icon className={`w-4 h-4 group-hover:scale-110 transition-transform ${isActive ? "text-white" : ""}`} />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
           </nav>
 
           {/* Right: action icons */}

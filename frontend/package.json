@@ -23,6 +23,7 @@
     "axios": "^1.13.2",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "pdf-parse-debugging-disabled": "^1.1.1",
     "react-hot-toast": "^2.6.0",
     "zod": "^3.25.76"
   },

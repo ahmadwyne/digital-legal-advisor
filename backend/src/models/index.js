@@ -172,6 +172,8 @@ db.ActivityLog = require("./ActivityLog")(sequelize, Sequelize);
 db.Dataset = require("./DataSet")(sequelize, Sequelize);
 db.Response = require("./Response")(sequelize, Sequelize);
 db.History = require("./History")(sequelize, Sequelize);
+db.DocumentSummary = require("./DocumentSummary")(sequelize, Sequelize);
+db.DocumentSummaryHistory = require("./DocumentSummaryHistory")(sequelize, Sequelize);
 
 // =======================
 // Dataset associations
