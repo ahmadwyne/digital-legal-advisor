@@ -11,15 +11,16 @@
 // module.exports = router;
 
 const express = require('express');
-const router = express.Router();
-const { sendMessage, getHistory } = require('../controllers/chatController');
-
-// If you have auth middleware, add it here:
+const router  = express.Router();
+const { sendMessage, getHistory, deleteMessage, postFeedback } = require('../controllers/chatController');
 const { protect } = require('../middlewares/authMiddleware');
-router.post('/', protect, sendMessage);
-router.get('/history', protect, getHistory);
 
-router.post('/', sendMessage);
-router.get('/history', getHistory);
+// All routes require authentication
+router.use(protect);
+
+router.post('/', sendMessage);   // Send a message → get AI response
+router.get('/history', getHistory);    // Fetch user's chat history
+router.delete('/:queryId', deleteMessage); // Delete a specific chat entry
+router.post('/feedback', postFeedback);  // Submit like/dislike + comment
 
 module.exports = router;

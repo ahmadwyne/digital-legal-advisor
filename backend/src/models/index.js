@@ -174,6 +174,7 @@ db.Response = require("./Response")(sequelize, Sequelize);
 db.History = require("./History")(sequelize, Sequelize);
 db.DocumentSummary = require("./DocumentSummary")(sequelize, Sequelize);
 db.DocumentSummaryHistory = require("./DocumentSummaryHistory")(sequelize, Sequelize);
+db.Feedback = require("./Feedback")(sequelize, Sequelize);
 
 // =======================
 // Dataset associations
