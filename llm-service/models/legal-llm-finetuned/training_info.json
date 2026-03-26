@@ -1,0 +1,13 @@
+{
+  "model_name": "mistralai/Mistral-7B-Instruct-v0.2",
+  "total_examples": 2092,
+  "training_examples": 1882,
+  "eval_examples": 210,
+  "num_epochs": 3,
+  "batch_size": 4,
+  "learning_rate": 0.0002,
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "trained_by": "ahmadwyne-fast",
+  "training_date": "2025-11-20"
+}

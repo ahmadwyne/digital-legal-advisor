@@ -170,6 +170,8 @@ db.User = require("./User")(sequelize, Sequelize);
 db.Query = require("./Query")(sequelize, Sequelize);
 db.ActivityLog = require("./ActivityLog")(sequelize, Sequelize);
 db.Dataset = require("./DataSet")(sequelize, Sequelize);
+db.Response = require("./Response")(sequelize, Sequelize);
+db.History = require("./History")(sequelize, Sequelize);
 
 // =======================
 // Dataset associations

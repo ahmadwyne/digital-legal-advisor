@@ -37,6 +37,14 @@ module.exports = (sequelize) => {
       foreignKey: 'userId',
       as: 'user'
     });
+    Query.hasOne(models.Response, {
+      foreignKey: 'queryId',
+      as: 'response'
+    });
+    Query.hasMany(models.History, {
+      foreignKey: 'queryId',
+      as: 'historyEntries'
+    });
   };
 
   return Query;

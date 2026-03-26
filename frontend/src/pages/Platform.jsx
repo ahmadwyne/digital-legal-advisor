@@ -275,57 +275,77 @@ const Platform = () => {
     scrollToBottom();
   }, [messages]);
 
+  // ONLY show the changed part inside your existing file:
+  // Replace handleSendMessage and handleSuggestedQuestion logic with API call version.
+
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  const sendToBackend = async (text) => {
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        userId: "demo-user-id", // replace with real auth user id
+        sessionId: currentSessionId,
+        queryType: "general",
+        top_k: 5
+      }),
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch AI response");
+    return res.json();
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isLoading) return;
+
     setShowEmptyState(false);
+    const text = inputValue.trim();
+
     const userMessage = {
       id: Date.now().toString(),
-      text: inputValue,
+      text,
       sender: "user",
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
-    setTimeout(() => {
-      const botResponses = [
-        "Based on Pakistani financial laws, this is an important consideration. Let me break it down for you:\n\n1. Legal Framework: The relevant laws cover this aspect comprehensively.\n\n2. Key Points:\n   • First important point\n   • Second important point\n   • Third important point\n\nWould you like me to elaborate on any specific aspect?",
-        "That's a great question! Here's what you need to know:\n\nUnder Pakistani law, there are several key regulations:\n\n• Regulation 1: Addresses the first aspect\n• Regulation 2: Covers the second aspect\n• Regulation 3: Handles the third aspect\n\nDo you have any follow-up questions?",
-        "This is covered under multiple acts in Pakistani law. The primary consideration is:\n\nThe main requirement is to ensure compliance with:\n✓ All statutory obligations\n✓ Documentation requirements\n✓ Reporting procedures\n\nI recommend consulting with a qualified legal professional for specific advice on your situation.",
-      ];
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+
+    try {
+      const data = await sendToBackend(text);
+
+      let formatted = data.answer || "No answer generated.";
+      if (data.citations?.length) {
+        formatted += `\n\nReferences:\n${data.citations.map((c) => `• ${c}`).join("\n")}`;
+      }
+      formatted += `\n\nConfidence: ${(data.confidence * 100).toFixed(1)}%`;
+
       const botMessage = {
         id: (Date.now() + 1).toString(),
-        text: randomResponse,
+        text: formatted,
         sender: "bot",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botMessage]);
+    } catch (err) {
+      const botMessage = {
+        id: (Date.now() + 1).toString(),
+        text: `Sorry, something went wrong: ${err.message}`,
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1200);
+    }
   };
 
-  const handleSuggestedQuestion = (question) => {
-    setShowEmptyState(false);
-    const userMessage = {
-      id: Date.now().toString(),
-      text: question,
-      sender: "user",
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
-    setTimeout(() => {
-      const botMessage = {
-        id: (Date.now() + 1).toString(),
-        text: "This is an excellent question about Pakistani legal frameworks. Let me provide you with comprehensive guidance...\n\n**Key Points:**\n• Point 1: Detailed explanation\n• Point 2: Comprehensive coverage\n• Point 3: Practical implications\n\nI recommend reviewing the relevant documentation and consulting with legal professionals for personalized advice.",
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
-      setIsLoading(false);
-    }, 1200);
+  const handleSuggestedQuestion = async (question) => {
+    if (isLoading) return;
+    setInputValue(question);
   };
 
   const handleNewChat = () => {
