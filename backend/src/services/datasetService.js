@@ -213,6 +213,7 @@ class DatasetService {
         version,
         status: 'active',
         isPublic: isPublic !== undefined ? isPublic : true,
+        isDeleted: false,
         tags: this.normalizeTags(tags),
         jurisdiction,
         dateRange,
@@ -239,7 +240,9 @@ class DatasetService {
       // Return dataset with user info
       return await this.getDatasetById(dataset.id);
     } catch (error) {
-      await transaction.rollback();
+      if (!transaction.finished) {
+        await transaction.rollback();
+      }
       throw new Error(`Error creating dataset: ${error.message}`);
     }
   }
