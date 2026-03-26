@@ -4,14 +4,12 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE,
-  withCredentials: true, // keep if you also use cookies elsewhere
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -34,5 +32,15 @@ export const summarizeDocument = async (file, onProgress) => {
 
 export const submitSummaryFeedback = async (payload) => {
   const response = await api.post('/summarizer/feedback', payload);
+  return response.data;
+};
+
+export const getSummaryHistoryItem = async (id) => {
+  const response = await api.get(`/summarizer/history/${id}`);
+  return response.data;
+};
+
+export const deleteSummaryHistoryItem = async (id) => {
+  const response = await api.delete(`/summarizer/history/${id}`);
   return response.data;
 };

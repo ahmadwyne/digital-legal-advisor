@@ -12,7 +12,9 @@ import {
   Plus,
   Scale,
   Clock3,
+  Trash2,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import { useDocumentSummarizer } from "@/hooks/useDocumentSummarizer";
 import { useSummarizerHistory } from "@/hooks/useSummarizerHistory";
@@ -21,25 +23,49 @@ import ProcessingStatus from "@/components/documentSummarizer/ProcessingStatus";
 import SummaryDisplay from "@/components/documentSummarizer/SummaryDisplay";
 import FeedbackModal from "@/components/documentSummarizer/FeedbackModal";
 
-const HistoryItem = ({ item }) => {
+const HistoryItem = ({ item, isActive, onClick, onDelete }) => {
+  const [isHovering, setIsHovering] = useState(false);
   const date = item?.uploadDate ? new Date(item.uploadDate) : null;
   const dateText = date ? date.toLocaleDateString() : "Unknown date";
 
   return (
-    <div className="group p-3 rounded-xl border border-transparent hover:bg-blue-50 text-gray-700 transition-all duration-300 transform hover:scale-[1.02] cursor-default">
-      <div className="min-w-0">
-        <p className="text-sm font-semibold truncate text-gray-800 group-hover:text-blue-600" style={{ fontFamily: "Inter" }}>
+    <div
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      onClick={onClick}
+      className={`group p-3 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-105 flex items-center justify-between ${
+        isActive
+          ? "bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 border-2 border-amber-400/70 shadow-lg shadow-blue-500/30 text-white animate-scale-in"
+          : "hover:bg-blue-50 border border-transparent text-gray-700"
+      }`}
+    >
+      <div className="flex-1 min-w-0">
+        <p
+          className={`text-sm font-semibold truncate transition-colors duration-300 ${
+            isActive ? "text-white" : "text-gray-800 group-hover:text-blue-600"
+          }`}
+          style={{ fontFamily: "Inter" }}
+        >
           {item.fileName}
         </p>
-        <p className="text-xs truncate mt-1 text-gray-500" style={{ fontFamily: "Inter" }}>
+        <p className={`text-xs truncate mt-1 ${isActive ? "text-blue-100" : "text-gray-500"}`} style={{ fontFamily: "Inter" }}>
           {item.fileType?.toUpperCase()} • {dateText}
         </p>
-        {item.docType && (
-          <p className="text-[11px] mt-1 text-blue-600 font-medium" style={{ fontFamily: "Inter" }}>
-            {item.docType}
-          </p>
-        )}
       </div>
+
+      {isHovering && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(item.id);
+          }}
+          className={`p-1.5 rounded-md transition-all duration-200 transform hover:scale-110 ml-2 animate-fade-in-up ${
+            isActive ? "hover:bg-red-500/30 text-white" : "hover:bg-red-100 text-red-600"
+          }`}
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 };
@@ -50,7 +76,8 @@ const DocumentSummarizer = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [activeHistoryId, setActiveHistoryId] = useState(null);
+  
   const {
     uploadedFile,
     summary,
@@ -64,9 +91,17 @@ const DocumentSummarizer = () => {
     handleFeedback,
     handleFeedbackModalSubmit,
     handleReset,
+    setSummary,
+    setError,
   } = useDocumentSummarizer();
 
-  const { history, loading: historyLoading, refetchHistory } = useSummarizerHistory({ limit: 50 });
+  const {
+    history,
+    loading: historyLoading,
+    refetchHistory,
+    getHistoryItemSummary,
+    deleteHistoryItem,
+  } = useSummarizerHistory({ limit: 50 });
 
   const filteredHistory = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -86,8 +121,33 @@ const DocumentSummarizer = () => {
   ];
 
   const handleNewSummary = () => {
+    setActiveHistoryId(null);
     handleReset();
     refetchHistory();
+  };
+
+  const handleHistorySelect = async (id) => {
+    try {
+      setError(null);
+      setActiveHistoryId(id);
+      const data = await getHistoryItemSummary(id);
+      setSummary(data);
+    } catch (e) {
+      toast.error("Could not load saved summary.");
+    }
+  };
+
+  const handleHistoryDelete = async (id) => {
+    try {
+      await deleteHistoryItem(id);
+      if (activeHistoryId === id) {
+        setActiveHistoryId(null);
+        handleReset();
+      }
+      toast.success("Summary deleted.");
+    } catch (e) {
+      toast.error("Could not delete summary.");
+    }
   };
 
   return (
@@ -166,7 +226,13 @@ const DocumentSummarizer = () => {
               ) : filteredHistory.length > 0 ? (
                 <div className="space-y-2">
                   {filteredHistory.map((item) => (
-                    <HistoryItem key={item.id} item={item} />
+                    <HistoryItem
+                      key={item.id}
+                      item={item}
+                      isActive={activeHistoryId === item.id}
+                      onClick={() => handleHistorySelect(item.id)}
+                      onDelete={handleHistoryDelete}
+                    />
                   ))}
                 </div>
               ) : (
@@ -175,7 +241,7 @@ const DocumentSummarizer = () => {
                 </p>
               )}
             </div>
-
+            
             <div
               className="border-t border-blue-200 p-4"
               style={{

@@ -63,7 +63,59 @@ const getUserSummaryHistory = async ({ userId, limit = 20, offset = 0 }) => {
   };
 };
 
+const getSummaryByIdForUser = async ({ userId, id }) => {
+  const row = await DocumentSummary.findOne({
+    where: { id, userId }
+  });
+
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    documentId: row.documentId,
+    type: row.docType,
+    year: row.docYear,
+    source: row.fileName,
+    content: row.summaryContent,
+    wordCount: row.wordCount,
+    usedAI: row.usedAI,
+    method: row.method,
+    fileType: row.fileType,
+    uploadDate: row.uploadDate,
+    isValid: row.isValid
+  };
+};
+
+const deleteSummaryForUser = async ({ userId, id }) => {
+  return sequelize.transaction(async (t) => {
+    const row = await DocumentSummary.findOne({
+      where: { id, userId },
+      transaction: t
+    });
+
+    if (!row) return { deleted: false };
+
+    await DocumentSummaryHistory.destroy({
+      where: { userId, documentSummaryId: id },
+      transaction: t
+    });
+
+    await row.destroy({ transaction: t });
+
+    await ActivityLog.create({
+      userId,
+      eventType: 'Document Summary Deleted',
+      severity: 'warning',
+      details: `Document summary deleted: ${row.fileName}`
+    }, { transaction: t });
+
+    return { deleted: true };
+  });
+};
+
 module.exports = {
   saveSummaryRecord,
-  getUserSummaryHistory
+  getUserSummaryHistory,
+  getSummaryByIdForUser,
+  deleteSummaryForUser
 };

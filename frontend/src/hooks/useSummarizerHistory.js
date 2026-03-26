@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import axios from 'axios';
 import { getAccessToken } from '@/utils/tokenManager';
+import { getSummaryHistoryItem, deleteSummaryHistoryItem } from '@/services/summarizerService';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
@@ -38,6 +39,16 @@ export const useSummarizerHistory = ({ limit = 50 } = {}) => {
     }
   }, [api, limit]);
 
+  const getHistoryItemSummary = useCallback(async (id) => {
+    const res = await getSummaryHistoryItem(id);
+    return res?.data;
+  }, []);
+
+  const deleteHistoryItem = useCallback(async (id) => {
+    await deleteSummaryHistoryItem(id);
+    setHistory((prev) => prev.filter((h) => h.id !== id));
+  }, []);
+
   useEffect(() => {
     fetchHistory();
   }, [fetchHistory]);
@@ -47,6 +58,8 @@ export const useSummarizerHistory = ({ limit = 50 } = {}) => {
     loading,
     error,
     refetchHistory: fetchHistory,
+    getHistoryItemSummary,
+    deleteHistoryItem,
   };
 };
 
