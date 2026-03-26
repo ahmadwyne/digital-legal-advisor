@@ -6,6 +6,7 @@ const userRoutes = require("./userRoutes");
 const adminRoutes = require("./adminRoutes");
 const datasetRoutes = require('./datasetRoutes');
 const chatRoutes = require('./chatRoutes');
+const summarizerRoutes = require('./summarizerRoutes');
 
 // Health check
 router.get("/health", (req, res) => {
@@ -20,4 +21,6 @@ router.use("/users", userRoutes);
 router.use("/admin", adminRoutes);
 router.use('/datasets', datasetRoutes);
 router.use('/chat', chatRoutes);
+router.use('/summarizer', summarizerRoutes);
+
 module.exports = router;

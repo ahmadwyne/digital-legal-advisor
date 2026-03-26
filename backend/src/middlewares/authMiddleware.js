@@ -7,7 +7,7 @@ exports.protect = async (req, res, next) => {
     let token;
 
     // Check for token in headers
-    if (req.headers. authorization && req.headers.authorization.startsWith('Bearer')) {
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
 
@@ -20,7 +20,7 @@ exports.protect = async (req, res, next) => {
 
     try {
       // Verify token
-      const decoded = jwt.verify(token, config. jwtSecret);
+      const decoded = jwt.verify(token, config.jwtSecret);
 
       // Get user from token
       const user = await User. findByPk(decoded.id);

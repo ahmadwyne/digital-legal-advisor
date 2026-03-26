@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children, allowAdminAccess = true }) => {
   }
 
   // If admin and this route doesn't allow admin access, redirect to admin dashboard
-  if (! allowAdminAccess && user?. role === 'admin') {
+  if (! allowAdminAccess && user?.role === 'admin') {
     return <Navigate to="/admin" replace />;
   }
 
