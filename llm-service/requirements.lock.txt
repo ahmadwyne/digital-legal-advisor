@@ -1,0 +1,16 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+pydantic==2.10.6
+python-dotenv==1.0.1
+numpy==1.26.4
+scipy==1.13.1
+rank-bm25==0.2.2
+faiss-cpu==1.8.0.post1
+sentence-transformers==3.4.1
+transformers==4.49.0
+tokenizers==0.21.0
+accelerate==1.4.0
+peft==0.14.0
+safetensors==0.5.3
+huggingface-hub==0.29.1
+torch==2.6.0

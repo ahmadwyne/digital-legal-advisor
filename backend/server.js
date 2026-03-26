@@ -1,7 +1,7 @@
 require('dotenv').config();
 const app = require('./src/app');
 const { sequelize } = require('./src/models');
-const { initializeBucket } = require('./src/utils/SupabaseStorage');
+const { initializeBucket } = require('e:/Digital Legal Advisor/DLA_Frontend/backend/src/utils/supabaseStorage');
 
 const PORT = process.env.PORT || 5000;
 
