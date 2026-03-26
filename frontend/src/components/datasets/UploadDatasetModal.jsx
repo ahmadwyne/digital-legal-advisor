@@ -580,7 +580,7 @@ import { cn } from '@/lib/utils';
 export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
     const [formData, setFormData] = useState({
         name: '', description: '', category: '', fileFormat: '',
@@ -619,13 +619,34 @@ export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
     }, [open, loading]);
 
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+
+        const validFiles = [];
+        const rejectedFiles = [];
+
+        files.forEach((file) => {
             if (file.size > 50 * 1024 * 1024) {
-                toast({ title: 'Error', description: 'File size must be less than 50MB', variant: 'destructive', });
+                rejectedFiles.push(file.name);
                 return;
             }
-            setSelectedFile(file);
+            validFiles.push(file);
+        });
+
+        if (rejectedFiles.length) {
+            toast({
+                title: 'Some files were skipped',
+                description: `Max 50MB: ${rejectedFiles.join(', ')}`,
+                variant: 'destructive',
+            });
+        }
+
+        if (!validFiles.length) return;
+
+        setSelectedFiles(validFiles);
+
+        if (validFiles.length === 1) {
+            const [file] = validFiles;
             const extension = file.name.split('.').pop().toLowerCase();
             if (['json', 'csv', 'txt', 'pdf', 'docx', 'xlsx'].includes(extension)) {
                 setFormData(prev => ({ ...prev, fileFormat: extension }));
@@ -658,10 +679,12 @@ export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
 
     const validateForm = () => {
         const newErrors = {};
-        if (!selectedFile) newErrors.file = 'Please select a file to upload';
-        if (!formData.name || formData.name.trim().length < 3) newErrors.name = 'Dataset name must be at least 3 characters';
+        if (!selectedFiles.length) newErrors.file = 'Please select a file to upload';
+        if (selectedFiles.length === 1 && (!formData.name || formData.name.trim().length < 3)) {
+            newErrors.name = 'Dataset name must be at least 3 characters';
+        }
         if (!formData.category) newErrors.category = 'Please select a category';
-        if (!formData.fileFormat) newErrors.fileFormat = 'Please select a file format';
+        if (selectedFiles.length === 1 && !formData.fileFormat) newErrors.fileFormat = 'Please select a file format';
         if (formData.version && !/^\d+\.\d+$/.test(formData.version)) newErrors.version = 'Version must be in format X.Y (e.g., 1.0)';
         
         setErrors(newErrors);
@@ -677,28 +700,57 @@ export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
 
         setLoading(true);
         try {
-            const uploadData = new FormData();
-            uploadData.append('file', selectedFile);
-            uploadData.append('name', formData.name.trim());
-            uploadData.append('description', formData.description.trim());
-            uploadData.append('category', formData.category);
-            uploadData.append('fileFormat', formData.fileFormat);
-            uploadData.append('version', formData.version);
-            uploadData.append('tags', JSON.stringify(formData.tags));
-            uploadData.append('isPublic', formData.isPublic.toString());
-            if (formData.jurisdiction) uploadData.append('jurisdiction', formData.jurisdiction.trim());
+            let successCount = 0;
+            const failures = [];
 
-            await datasetService.createDataset(uploadData);
+            for (const file of selectedFiles) {
+                const uploadData = new FormData();
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                const resolvedName = selectedFiles.length === 1
+                    ? formData.name.trim()
+                    : file.name.replace(/\.[^/.]+$/, '');
 
-            setFormData({ name: '', description: '', category: '', fileFormat: '', version: '1.0', jurisdiction: '', tags: [], isPublic: true });
-            setSelectedFile(null);
-            setErrors({});
-            toast({
-                variant: 'success',
-                title: 'Uploaded',
-                description: 'Dataset uploaded successfully',
-            });
-            onSuccess();
+                uploadData.append('file', file);
+                uploadData.append('name', resolvedName);
+                uploadData.append('description', formData.description.trim());
+                uploadData.append('category', formData.category);
+                uploadData.append('fileFormat', formData.fileFormat || fileExtension);
+                uploadData.append('version', formData.version);
+                uploadData.append('tags', JSON.stringify(formData.tags));
+                uploadData.append('isPublic', formData.isPublic.toString());
+                if (formData.jurisdiction) uploadData.append('jurisdiction', formData.jurisdiction.trim());
+
+                try {
+                    await datasetService.createDataset(uploadData);
+                    successCount += 1;
+                } catch (error) {
+                    const errorMessage = error.response?.data?.message || 'Failed to upload dataset';
+                    failures.push({ fileName: file.name, errorMessage });
+                }
+            }
+
+            if (successCount) {
+                toast({
+                    variant: 'success',
+                    title: 'Uploaded',
+                    description: `${successCount} dataset${successCount > 1 ? 's' : ''} uploaded successfully`,
+                });
+                onSuccess();
+            }
+
+            if (failures.length) {
+                toast({
+                    title: 'Upload Failed',
+                    description: `${failures.length} file${failures.length > 1 ? 's' : ''} failed. First error: ${failures[0].fileName} - ${failures[0].errorMessage}`,
+                    variant: 'destructive',
+                });
+            }
+
+            if (!failures.length) {
+                setFormData({ name: '', description: '', category: '', fileFormat: '', version: '1.0', jurisdiction: '', tags: [], isPublic: true });
+                setSelectedFiles([]);
+                setErrors({});
+            }
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Failed to upload dataset';
             const validationErrors = error.response?.data?.errors;
@@ -716,7 +768,7 @@ export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
     const handleClose = () => {
         if (!loading) {
             setFormData({ name: '', description: '', category: '', fileFormat: '', version: '1.0', jurisdiction: '', tags: [], isPublic: true });
-            setSelectedFile(null);
+            setSelectedFiles([]);
             setErrors({});
             setTagInput('');
             setOpen(false);
@@ -771,32 +823,45 @@ export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
                                 id="file"
                                 type="file"
                                 accept=".json,.csv,.txt,.pdf,.docx,.xlsx"
+                                multiple
                                 onChange={handleFileChange}
                                 className="hidden"
                             />
                             <label htmlFor="file" className="cursor-pointer block w-full h-full">
-                                {selectedFile ? (
-                                    <div className="flex items-center justify-center gap-4">
-                                        <div className="bg-blue-100 p-3 rounded-xl">
-                                            <FileText className="h-8 w-8 text-blue-700" />
+                                {selectedFiles.length ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3 justify-center">
+                                            <div className="bg-blue-100 p-3 rounded-xl">
+                                                <FileText className="h-8 w-8 text-blue-700" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="font-bold text-gray-800 text-lg">
+                                                    {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
+                                                </p>
+                                                <p className="text-sm font-medium text-blue-600">
+                                                    {(selectedFiles.reduce((sum, file) => sum + file.size, 0) / 1024 / 1024).toFixed(2)} MB total
+                                                </p>
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                className="ml-auto hover:bg-red-50 hover:text-red-600 rounded-lg"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setSelectedFiles([]);
+                                                }}
+                                            >
+                                                <X className="h-5 w-5" />
+                                            </Button>
                                         </div>
-                                        <div className="text-left">
-                                            <p className="font-bold text-gray-800 text-lg">{selectedFile.name}</p>
-                                            <p className="text-sm font-medium text-blue-600">
-                                                {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                                            </p>
+                                        <div className="max-h-32 overflow-y-auto rounded-lg border border-blue-100 bg-white/70 p-3 text-left">
+                                            {selectedFiles.map((file) => (
+                                                <div key={file.name} className="flex items-center justify-between py-1 text-sm font-medium text-gray-700">
+                                                    <span className="truncate pr-3">{file.name}</span>
+                                                    <span className="text-blue-600">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            className="ml-auto hover:bg-red-50 hover:text-red-600 rounded-lg"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setSelectedFile(null);
-                                            }}
-                                        >
-                                            <X className="h-5 w-5" />
-                                        </Button>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center">
@@ -807,7 +872,7 @@ export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
                                             Click to upload or drag and drop
                                         </p>
                                         <p className="text-sm font-medium text-gray-500 mt-2">
-                                            JSON, CSV, TXT, PDF, DOCX, XLSX (Max 50MB)
+                                            JSON, CSV, TXT, PDF, DOCX, XLSX (Max 50MB each)
                                         </p>
                                     </div>
                                 )}
@@ -830,6 +895,11 @@ export const UploadDatasetModal = ({ open, setOpen, onSuccess }) => {
                             onChange={(e) => handleInputChange('name', e.target.value)}
                             className={cn("rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500", errors.name && 'border-red-500')}
                         />
+                        {selectedFiles.length > 1 && (
+                            <p className="text-xs font-semibold text-blue-600">
+                                For multiple files, each dataset name is taken from the file name.
+                            </p>
+                        )}
                         {errors.name && (
                             <p className="text-sm font-bold text-red-500 flex items-center gap-1.5 mt-1">
                                 <AlertCircle className="h-4 w-4" /> {errors.name}
