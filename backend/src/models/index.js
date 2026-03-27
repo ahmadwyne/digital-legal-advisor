@@ -175,6 +175,10 @@ db.History = require("./History")(sequelize, Sequelize);
 db.DocumentSummary = require("./DocumentSummary")(sequelize, Sequelize);
 db.DocumentSummaryHistory = require("./DocumentSummaryHistory")(sequelize, Sequelize);
 db.Feedback = require("./Feedback")(sequelize, Sequelize);
+db.Precedent = require("./Precedent")(sequelize, Sequelize);
+db.PrecedentSearch = require("./PrecedentSearch")(sequelize, Sequelize);
+db.QueryPrecedent= require("./QueryPrecedent")(sequelize, Sequelize);
+db.PrecedentFeedback = require("./PrecedentFeedback")(sequelize, Sequelize);
 
 // =======================
 // Dataset associations
