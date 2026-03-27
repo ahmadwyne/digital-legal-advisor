@@ -58,7 +58,7 @@ class AuthService {
     console.log('═══════════════════════════════════════════');
     console.log('User:', user.email);
     console.log('Token:', verificationToken);
-    console.log('Link:', `${process.env. FRONTEND_URL}/verify-email? token=${verificationToken}`);
+    console.log('Link:', `${process.env. FRONTEND_URL}/verify-email?token=${verificationToken}`);
     console.log('═══════════════════════════════════════════\n');
 
     // Send verification email (optional)

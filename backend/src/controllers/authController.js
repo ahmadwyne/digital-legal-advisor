@@ -63,7 +63,7 @@ exports.googleAuthCallback = async (req, res, next) => {
     const user = req.user;
 
     if (!user) {
-      return res.redirect(`${process.env.FRONTEND_URL}/login? error=authentication_failed`);
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
     }
 
     // Generate tokens
