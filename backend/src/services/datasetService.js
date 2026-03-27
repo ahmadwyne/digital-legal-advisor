@@ -1,7 +1,7 @@
 const { Dataset, User, ActivityLog, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const { getPagination } = require('../utils/pagination');
-const storageUtil = require('../utils/supabaseStorage');
+const storageUtil = require('../utils/SupabaseStorage');
 
 class DatasetService {
   normalizeTags(tags) {
