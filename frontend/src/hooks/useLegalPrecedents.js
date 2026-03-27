@@ -1,96 +1,184 @@
-import { useState, useCallback } from 'react';
-// import { precedentsApi } from '@/api/precedentsApi'; // TODO: Create when backend is ready
+import { useState, useCallback, useRef } from 'react';
+import { precedentsApi } from '@/api/precedentsApi';
 
-const MOCK_PRECEDENTS = [
-  {
-    id: 1,
-    srNo: 1,
-    caseNo: 'Crl.  Revision 21000/24',
-    title: 'MST KOSAR MAI VS SHO ETC',
-    judge: 'Mr. Justice Anwaarul Haq Pannun',
-  },
-  {
-    id:  2,
-    srNo:  2,
-    caseNo: 'Crl.  Misc.-Habeas Corpus 2446-H-20',
-    title: 'Corpus 2446-H-20 MST KOSAR MAI VS SHO ETC',
-    judge: 'Mr. Justice Anwaarul Haq Pannun',
-  },
-  {
-    id: 3,
-    srNo: 3,
-    caseNo: 'Crl. Misc.  63668/24',
-    title: 'Waseem Vs The State etc.',
-    judge: 'Mr. Justice Shakil Ahmad',
-  },
-  {
-    id: 4,
-    srNo: 4,
-    caseNo: 'Jail Appeal 24464/21',
-    title: 'Muhammad Arshad etc. Vs The State.',
-    judge: 'Mr.  Justice Shakil Ahmad',
-  },
-];
-
+/**
+ * useLegalPrecedents — manages search, history, feedback, and downloads
+ * for the Legal Precedents feature.
+ */
 export const useLegalPrecedents = () => {
-  const [precedents, setPrecedents] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // ─── Search state ────────────────────────────────────────────────────────
+  const [results,     setResults]     = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [currentSearchId, setCurrentSearchId] = useState(null);
+  const [currentQuery,    setCurrentQuery]    = useState('');
 
+  // ─── History state ───────────────────────────────────────────────────────
+  const [history,        setHistory]        = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError,   setHistoryError]   = useState(null);
+  const [historyTotal,   setHistoryTotal]   = useState(0);
+
+  // ─── Detail modal state ──────────────────────────────────────────────────
+  const [detailPrecedent, setDetailPrecedent] = useState(null);
+  const [detailLoading,   setDetailLoading]   = useState(false);
+
+  // ─── Feedback state ──────────────────────────────────────────────────────
+  const [feedbackState, setFeedbackState] = useState({}); // { [searchId]: 'helpful'|'not_helpful' }
+
+  // ─── Download state ──────────────────────────────────────────────────────
+  const [downloading, setDownloading] = useState({}); // { [precedentId]: boolean }
+
+  // ─── Abort ref ───────────────────────────────────────────────────────────
+  const abortRef = useRef(null);
+
+  // ────────────────────────────────────────────────────────────────────────
+  // SEARCH
+  // ────────────────────────────────────────────────────────────────────────
   const searchPrecedents = useCallback(async (query) => {
+    if (!query.trim()) return;
+    setIsSearching(true);
+    setSearchError(null);
+    setHasSearched(true);
+    setCurrentQuery(query);
+    setResults([]);
+
     try {
-      setIsLoading(true);
-      setError(null);
-      setHasSearched(true);
-
-      // TODO: Replace with actual API call
-      // const response = await precedentsApi.search(query);
-      
-      // Mock search with delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Filter mock data based on query
-      const filtered = MOCK_PRECEDENTS. filter(p =>
-        p.title.toLowerCase().includes(query.toLowerCase()) ||
-        p.caseNo.toLowerCase().includes(query.toLowerCase()) ||
-        p.judge.toLowerCase().includes(query.toLowerCase())
-      );
-
-      setPrecedents(filtered. length > 0 ? filtered :  MOCK_PRECEDENTS);
-      
+      const res = await precedentsApi.search({ query, topK: 10 });
+      setResults(res.data.results || []);
+      setCurrentSearchId(res.data.searchId);
     } catch (err) {
-      setError(err.message);
-      console.error('Precedents search error:', err);
+      setSearchError(err.message || 'Search failed. Please try again.');
     } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const downloadJudgment = useCallback(async (precedentId) => {
-    try {
-      console.log('Downloading judgment for precedent:', precedentId);
-      // TODO:  Implement actual download
-      // await precedentsApi.downloadJudgment(precedentId);
-    } catch (err) {
-      console.error('Download error:', err);
+      setIsSearching(false);
     }
   }, []);
 
   const clearResults = useCallback(() => {
-    setPrecedents([]);
+    setResults([]);
     setHasSearched(false);
-    setError(null);
+    setSearchError(null);
+    setCurrentSearchId(null);
+    setCurrentQuery('');
   }, []);
 
+  // ────────────────────────────────────────────────────────────────────────
+  // HISTORY
+  // ────────────────────────────────────────────────────────────────────────
+  const loadHistory = useCallback(async ({ limit = 20, offset = 0 } = {}) => {
+    setHistoryLoading(true);
+    setHistoryError(null);
+    try {
+      const res = await precedentsApi.getHistory({ limit, offset });
+      setHistory(res.data.items || []);
+      setHistoryTotal(res.data.total || 0);
+    } catch (err) {
+      setHistoryError(err.message);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
+  const deleteSearch = useCallback(async (searchId) => {
+    try {
+      await precedentsApi.deleteSearch(searchId);
+      setHistory(prev => prev.filter(s => s.id !== searchId));
+      setHistoryTotal(prev => Math.max(0, prev - 1));
+      // If viewing deleted search's results, clear them
+      if (currentSearchId === searchId) clearResults();
+    } catch (err) {
+      console.error('Delete error:', err);
+    }
+  }, [currentSearchId, clearResults]);
+
+  const replaySearch = useCallback(async (searchId) => {
+    if (!searchId) return;
+    setIsSearching(true);
+    setSearchError(null);
+    setHasSearched(true);
+
+    try {
+      const res = await precedentsApi.getHistoryById(searchId); // new API call
+      const payload = res.data || {};
+
+      setCurrentSearchId(payload.id || searchId);
+      setCurrentQuery(payload.query || '');
+      setResults(payload.results || []);
+    } catch (err) {
+      setSearchError(err.message || 'Failed to load previous search.');
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // ────────────────────────────────────────────────────────────────────────
+  // DETAIL MODAL
+  // ────────────────────────────────────────────────────────────────────────
+  const openDetail = useCallback(async (precedentId) => {
+    setDetailLoading(true);
+    setDetailPrecedent(null);
+    try {
+      const res = await precedentsApi.getById(precedentId);
+      setDetailPrecedent(res.data.precedent);
+    } catch (err) {
+      console.error('Detail load error:', err);
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
+
+  const closeDetail = useCallback(() => {
+    setDetailPrecedent(null);
+    setDetailLoading(false);
+  }, []);
+
+  // ────────────────────────────────────────────────────────────────────────
+  // FEEDBACK
+  // ────────────────────────────────────────────────────────────────────────
+  const submitFeedback = useCallback(async ({ searchId, rating, comment }) => {
+    try {
+      await precedentsApi.submitFeedback({ searchId, rating, comment });
+      setFeedbackState(prev => ({ ...prev, [searchId]: rating }));
+    } catch (err) {
+      console.error('Feedback error:', err);
+    }
+  }, []);
+
+  // ────────────────────────────────────────────────────────────────────────
+  // DOWNLOAD
+  // ────────────────────────────────────────────────────────────────────────
+  const downloadJudgment = useCallback(async (precedentId, citation) => {
+    if (downloading[precedentId]) return;
+    setDownloading(prev => ({ ...prev, [precedentId]: true }));
+    try {
+      const filename = `${(citation || 'judgment').replace(/[/\\:*?"<>|]/g, '_')}.txt`;
+      await precedentsApi.download(precedentId, filename);
+    } catch (err) {
+      console.error('Download error:', err);
+    } finally {
+      setDownloading(prev => ({ ...prev, [precedentId]: false }));
+    }
+  }, [downloading]);
+
   return {
-    precedents,
-    isLoading,
-    error,
-    hasSearched,
-    searchPrecedents,
-    downloadJudgment,
-    clearResults
+    // Search
+    results, isSearching, searchError, hasSearched,
+    currentSearchId, currentQuery,
+    searchPrecedents, clearResults,
+
+    // History
+    history, historyLoading, historyError, historyTotal,
+    loadHistory, deleteSearch, replaySearch,
+
+    // Detail
+    detailPrecedent, detailLoading, openDetail, closeDetail,
+
+    // Feedback
+    feedbackState, submitFeedback,
+
+    // Download
+    downloading, downloadJudgment,
   };
 };
 
