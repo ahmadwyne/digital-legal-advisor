@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { setTokens } from '@/utils/tokenManager';
+import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast.js';
 import LogoSpinner from '@/components/ui/LogoSpinner';
-import { authApi } from '@/api/authApi';
 
 const AuthCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { loginWithGoogle } = useAuth();
   const hasProcessed = useRef(false);
 
   useEffect(() => {
@@ -23,36 +23,29 @@ const AuthCallback = () => {
       if (error) {
         toast({
           variant: 'destructive',
-          title:  'Authentication Failed',
-          description: error. replace(/_/g, ' '),
+          title: 'Authentication Failed',
+          description: error.replace(/_/g, ' '),
         });
         navigate('/login');
         return;
       }
 
       if (token && refreshToken) {
-        // Store tokens
-        setTokens(token, refreshToken);
+        const result = await loginWithGoogle(token, refreshToken);
 
-        // Get user info to determine redirect
-        try {
-          const userResponse = await authApi.getCurrentUser();
-          const user = userResponse.data. user;
-
+        if (result.success) {
           toast({
             title: 'Success',
             description: 'Logged in successfully with Google!',
           });
-
-          // Redirect based on role
-          if (user?.role === 'admin') {
-            navigate('/admin');
-          } else {
-            navigate('/platform');
-          }
-        } catch (err) {
-          // Fallback to platform if can't get user info
-          navigate('/platform');
+          navigate(result.user?.role === 'admin' ? '/admin' : '/platform');
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Authentication Failed',
+            description: 'Could not complete sign in. Please try again.',
+          });
+          navigate('/login');
         }
       } else {
         toast({

@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
+import { getAccessToken } from '@/utils/tokenManager';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
+  const token = getAccessToken();
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
