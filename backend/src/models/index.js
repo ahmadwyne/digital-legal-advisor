@@ -103,7 +103,7 @@
 // db.User = require("./User")(sequelize, Sequelize);
 // db.Query = require("./Query")(sequelize, Sequelize);
 // db.ActivityLog = require("./ActivityLog")(sequelize, Sequelize);
-// db.Dataset = require("./DataSet")(sequelize, Sequelize);
+// db.Dataset = require("./Dataset")(sequelize, Sequelize);
 
 // // Run associations
 // Object.keys(db).forEach((modelName) => {
@@ -169,7 +169,7 @@ db.sequelize = sequelize;
 db.User = require("./User")(sequelize, Sequelize);
 db.Query = require("./Query")(sequelize, Sequelize);
 db.ActivityLog = require("./ActivityLog")(sequelize, Sequelize);
-db.Dataset = require("./DataSet")(sequelize, Sequelize);
+db.Dataset = require("./Dataset")(sequelize, Sequelize);
 db.Response = require("./Response")(sequelize, Sequelize);
 db.History = require("./History")(sequelize, Sequelize);
 db.DocumentSummary = require("./DocumentSummary")(sequelize, Sequelize);
