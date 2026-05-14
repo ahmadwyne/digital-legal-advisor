@@ -1,0 +1,17 @@
+{
+  "embedding_model": "BAAI/bge-base-en-v1.5",
+  "reranker_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+  "dimension": 768,
+  "total_chunks": 6714,
+  "chunk_max_words": 300,
+  "chunk_size": 250,
+  "chunk_overlap": 100,
+  "chunk_stride": 150,
+  "hybrid_alpha": 0.6,
+  "rerank_candidates": 20,
+  "whole_chunks": 3724,
+  "split_chunks": 2990,
+  "unique_acts": 76,
+  "unique_pdfs": 77,
+  "version": "v2"
+}

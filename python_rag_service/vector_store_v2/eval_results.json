@@ -1,0 +1,20 @@
+{
+  "dense": {
+    "recall@1": 0.5,
+    "recall@3": 0.7,
+    "recall@5": 0.8,
+    "mrr": 0.614
+  },
+  "hybrid": {
+    "recall@1": 0.48,
+    "recall@3": 0.68,
+    "recall@5": 0.74,
+    "mrr": 0.583
+  },
+  "hybrid+rerank": {
+    "recall@1": 0.68,
+    "recall@3": 0.84,
+    "recall@5": 0.86,
+    "mrr": 0.754
+  }
+}
