@@ -25,7 +25,6 @@ import {
   ThumbsDown,
   AlertCircle,
   RefreshCcw,
-  CheckCircle2,
   LogOut,
   UserCircle,
 } from "lucide-react";
@@ -333,15 +332,9 @@ const MessageBubble = ({ message, isLatest, onFeedback, onOpenFeedbackModal }) =
             <div className="px-6 py-4 bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-100/30 text-gray-800 rounded-3xl rounded-bl-none border-2 border-blue-200 shadow-lg hover:shadow-blue-300/50 hover:border-blue-300 transition-all duration-300 relative group-hover:border-amber-400/50">
               <div className="absolute inset-0 bg-white/50 opacity-0 group-hover/msg:opacity-100 rounded-3xl transition-opacity duration-300" />
 
-              {/* Citations & confidence badge */}
-              {(message.citations?.length > 0 || message.confidence > 0) && (
+              {/* Citations & sources badge */}
+              {message.citations?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {message.confidence > 0 && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      {(message.confidence * 100).toFixed(0)}% confidence
-                    </span>
-                  )}
                   {message.numSources > 0 && (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
                       <BookOpen className="w-3.5 h-3.5" />
