@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
   Menu,
@@ -13,7 +13,10 @@ import {
   Scale,
   Clock3,
   Trash2,
+  LogOut,
+  UserCircle,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
 
 import { useDocumentSummarizer } from "@/hooks/useDocumentSummarizer";
@@ -73,9 +76,30 @@ const HistoryItem = ({ item, isActive, onClick, onDelete }) => {
 const DocumentSummarizer = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const settingsMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (settingsMenuRef.current && !settingsMenuRef.current.contains(e.target)) {
+        setShowSettingsMenu(false);
+      }
+    };
+    if (showSettingsMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showSettingsMenu]);
+
+  const handleLogout = async () => {
+    setShowSettingsMenu(false);
+    await logout();
+    navigate("/login");
+  };
   const [activeHistoryId, setActiveHistoryId] = useState(null);
   
   const {
@@ -243,16 +267,37 @@ const DocumentSummarizer = () => {
             </div>
             
             <div
-              className="border-t border-blue-200 p-4"
-              style={{
-                backgroundImage: `linear-gradient(135deg, #f0f9ff 0%, #fef3c7 100%)`,
-              }}
+              ref={settingsMenuRef}
+              className="relative border-t border-blue-200 p-4"
+              style={{ backgroundImage: `linear-gradient(135deg, #f0f9ff 0%, #fef3c7 100%)` }}
             >
+              {showSettingsMenu && (
+                <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-xl border border-blue-200 shadow-xl overflow-hidden z-50">
+                  <button
+                    onClick={() => { setShowSettingsMenu(false); navigate("/profile"); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-blue-700 hover:bg-blue-50 transition-all duration-200 group"
+                    style={{ fontFamily: "Inter" }}
+                  >
+                    <UserCircle className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform duration-200" />
+                    <span className="text-sm font-semibold">Profile</span>
+                  </button>
+                  <div className="border-t border-blue-100" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-all duration-200 group"
+                    style={{ fontFamily: "Inter" }}
+                  >
+                    <LogOut className="w-5 h-5 text-red-500 group-hover:scale-110 transition-transform duration-200" />
+                    <span className="text-sm font-semibold">Log Out</span>
+                  </button>
+                </div>
+              )}
               <button
+                onClick={() => setShowSettingsMenu((prev) => !prev)}
                 className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-blue-700 rounded-lg hover:bg-blue-100/50 transition-all duration-300 group hover:shadow-md"
                 style={{ fontFamily: "Inter" }}
               >
-                <Settings className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+                <Settings className={`w-5 h-5 transition-transform duration-500 ${showSettingsMenu ? "rotate-180 text-blue-600" : "group-hover:rotate-180"}`} />
                 <span className="text-sm font-semibold">Settings</span>
               </button>
             </div>

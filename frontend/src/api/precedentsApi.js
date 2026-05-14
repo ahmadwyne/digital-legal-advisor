@@ -1,16 +1,12 @@
 /**
  * precedentsApi.js  —  Frontend API service for legal precedents
  */
+import { getAccessToken } from '@/utils/tokenManager';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 const getAuthHeaders = () => {
-  const token =
-    localStorage.getItem('token') ||
-    localStorage.getItem('authToken') ||
-    localStorage.getItem('accessToken') ||
-    sessionStorage.getItem('token') ||
-    sessionStorage.getItem('authToken');
+  const token = getAccessToken();
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),

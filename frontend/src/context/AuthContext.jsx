@@ -190,6 +190,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async (accessToken, refreshToken) => {
+    try {
+      setTokens(accessToken, refreshToken);
+      const response = await authApi.getCurrentUser();
+      const userData = response.data.user;
+      persistUser(userData);
+      setUser(userData);
+      setIsAuth(true);
+      return { success: true, user: userData };
+    } catch (error) {
+      clearTokens();
+      setUser(null);
+      setIsAuth(false);
+      return { success: false };
+    }
+  };
+
   const updateUser = (updatedUser) => {
     setUser(updatedUser);
     persistUser(updatedUser);
@@ -202,6 +219,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    loginWithGoogle,
     updateUser,
   };
 

@@ -61,7 +61,7 @@ class AuthService {
     console.log('Link:', `${process.env. FRONTEND_URL}/verify-email?token=${verificationToken}`);
     console.log('═══════════════════════════════════════════\n');
 
-    // Send verification email (optional)
+    // Send verification email
     try {
       await emailService.sendVerificationEmail(user.email, verificationToken);
     } catch (emailError) {
@@ -181,33 +181,6 @@ class AuthService {
     await user.save();
 
     return { message: 'Email verified successfully', user };
-  }
-
-  // Request password reset
-  async requestPasswordReset(email) {
-    const user = await User.findOne({ where: { email } });
-
-    if (!user) {
-      // Don't reveal if user exists
-      return { message: 'If the email exists, a reset link has been sent' };
-    }
-
-    if (user.authProvider !== 'local') {
-      throw new Error(`This account uses ${user.authProvider} authentication`);
-    }
-
-    // Generate reset token
-    const resetToken = user.generatePasswordResetToken();
-    await user.save();
-
-    // Send reset email
-    try {
-      await emailService.sendPasswordResetEmail(user.email, resetToken);
-    } catch (emailError) {
-      console.error('Email sending failed:', emailError);
-    }
-
-    return { message: 'Password reset link sent to email' };
   }
 
   // Request password reset
