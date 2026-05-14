@@ -79,6 +79,11 @@ module.exports = (sequelize) => {
       foreignKey: 'documentSummaryId',
       as: 'historyEntries'
     });
+
+    DocumentSummary.hasMany(models.DocumentSummaryFeedback, {
+      foreignKey: 'documentSummaryId',
+      as: 'feedbackEntries'
+    });
   };
 
   return DocumentSummary;

@@ -1,5 +1,49 @@
-const { User, Query, ActivityLog, Dataset, sequelize } = require('../models');
+const {
+  User,
+  Query,
+  ActivityLog,
+  Dataset,
+  Feedback,
+  PrecedentFeedback,
+  DocumentSummaryFeedback,
+  Response,
+  PrecedentSearch,
+  DocumentSummary,
+  sequelize
+} = require('../models');
 const { Op } = require('sequelize');
+
+const MAX_FEEDBACK_LIMIT = 50;
+
+const normalizeLimit = (limit) => {
+  const value = Number(limit);
+  if (!Number.isFinite(value) || value <= 0) return 10;
+  return Math.min(value, MAX_FEEDBACK_LIMIT);
+};
+
+const formatCategory = (value) => {
+  if (!value) return 'Chatbot';
+  return String(value)
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const mapRatingToStars = (source, rating) => {
+  if (source === 'precedent') {
+    return rating === 'helpful' ? 5 : 1;
+  }
+
+  if (source === 'chat' || source === 'summarizer') {
+    return rating === 'like' ? 5 : 1;
+  }
+
+  return 3;
+};
+
+const calculateTrendPercent = (current, previous) => {
+  if (!previous) return 0;
+  return Number((((current - previous) / previous) * 100).toFixed(1));
+};
 
 class AdminService {
   // Get dashboard statistics
@@ -158,6 +202,251 @@ class AdminService {
       }));
     } catch (error) {
       throw new Error(`Error fetching activity chart data: ${error.message}`);
+    }
+  }
+
+  // Get feedback overview data
+  async getFeedbackOverview({ limit = 10 } = {}) {
+    try {
+      const safeLimit = normalizeLimit(limit);
+
+      const [chatFeedback, precedentFeedback, summaryFeedback] = await Promise.all([
+        Feedback.findAll({
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'firstName', 'lastName']
+            },
+            {
+              model: Response,
+              as: 'response',
+              attributes: ['id'],
+              include: [
+                {
+                  model: Query,
+                  as: 'query',
+                  attributes: ['queryType']
+                }
+              ]
+            }
+          ],
+          order: [['createdAt', 'DESC']],
+          limit: safeLimit
+        }),
+        PrecedentFeedback.findAll({
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'firstName', 'lastName']
+            },
+            {
+              model: PrecedentSearch,
+              as: 'search',
+              attributes: ['id', 'query']
+            }
+          ],
+          order: [['createdAt', 'DESC']],
+          limit: safeLimit
+        }),
+        DocumentSummaryFeedback.findAll({
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'firstName', 'lastName']
+            }
+          ],
+          order: [['createdAt', 'DESC']],
+          limit: safeLimit
+        })
+      ]);
+
+      const recent = [
+        ...chatFeedback.map((fb) => ({
+          id: fb.id,
+          source: 'chat',
+          category: formatCategory(fb.response?.query?.queryType),
+          rating: mapRatingToStars('chat', fb.rating),
+          rawRating: fb.rating,
+          comment: fb.comment || null,
+          createdAt: fb.createdAt,
+          user: fb.user
+            ? { id: fb.user.id, firstName: fb.user.firstName, lastName: fb.user.lastName }
+            : null,
+          userName: fb.user ? `${fb.user.firstName} ${fb.user.lastName}`.trim() : 'Anonymous'
+        })),
+        ...precedentFeedback.map((fb) => ({
+          id: fb.id,
+          source: 'precedent',
+          category: 'Legal Precedent',
+          rating: mapRatingToStars('precedent', fb.rating),
+          rawRating: fb.rating,
+          comment: fb.comment || null,
+          createdAt: fb.createdAt,
+          searchQuery: fb.search?.query || null,
+          user: fb.user
+            ? { id: fb.user.id, firstName: fb.user.firstName, lastName: fb.user.lastName }
+            : null,
+          userName: fb.user ? `${fb.user.firstName} ${fb.user.lastName}`.trim() : 'Anonymous'
+        })),
+        ...summaryFeedback.map((fb) => ({
+          id: fb.id,
+          source: 'summarizer',
+          category: 'Document Summarizer',
+          rating: mapRatingToStars('summarizer', fb.rating),
+          rawRating: fb.rating,
+          comment: fb.comment || fb.summarySnippet || null,
+          createdAt: fb.createdAt,
+          documentName: fb.documentName || null,
+          user: fb.user
+            ? { id: fb.user.id, firstName: fb.user.firstName, lastName: fb.user.lastName }
+            : null,
+          userName: fb.user ? `${fb.user.firstName} ${fb.user.lastName}`.trim() : 'Anonymous'
+        }))
+      ]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, safeLimit)
+        .map((item) => ({
+          ...item,
+          timeAgo: this.getTimeAgo(item.createdAt)
+        }));
+
+      const [
+        chatRatingCounts,
+        precedentRatingCounts,
+        summaryRatingCounts,
+        chatFeedbackCount,
+        precedentFeedbackCount,
+        summaryFeedbackCount,
+        chatResponsesCount,
+        precedentSearchCount,
+        summaryCount
+      ] = await Promise.all([
+        Feedback.findAll({
+          attributes: ['rating', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+          group: ['rating'],
+          raw: true
+        }),
+        PrecedentFeedback.findAll({
+          attributes: ['rating', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+          group: ['rating'],
+          raw: true
+        }),
+        DocumentSummaryFeedback.findAll({
+          attributes: ['rating', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+          group: ['rating'],
+          raw: true
+        }),
+        Feedback.count(),
+        PrecedentFeedback.count(),
+        DocumentSummaryFeedback.count(),
+        Response.count(),
+        PrecedentSearch.count(),
+        DocumentSummary.count()
+      ]);
+
+      const ratingBuckets = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+      const addCounts = (rows, source) => {
+        rows.forEach(({ rating, count }) => {
+          const stars = mapRatingToStars(source, rating);
+          ratingBuckets[stars] += Number(count) || 0;
+        });
+      };
+
+      addCounts(chatRatingCounts, 'chat');
+      addCounts(precedentRatingCounts, 'precedent');
+      addCounts(summaryRatingCounts, 'summarizer');
+
+      const totalFeedback =
+        chatFeedbackCount + precedentFeedbackCount + summaryFeedbackCount;
+
+      const totalScore = Object.entries(ratingBuckets)
+        .reduce((sum, [stars, count]) => sum + Number(stars) * count, 0);
+
+      const averageRating = totalFeedback
+        ? Number((totalScore / totalFeedback).toFixed(1))
+        : 0;
+
+      const totalInteractions =
+        chatResponsesCount + precedentSearchCount + summaryCount;
+
+      const responseRate = totalInteractions
+        ? Number(((totalFeedback / totalInteractions) * 100).toFixed(1))
+        : 0;
+
+      const distribution = [5, 4, 3, 2, 1].map((stars) => {
+        const count = ratingBuckets[stars] || 0;
+        const percentage = totalFeedback
+          ? Math.round((count / totalFeedback) * 100)
+          : 0;
+        return { stars, count, percentage };
+      });
+
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+      const [
+        chatFeedbackLast30,
+        precedentFeedbackLast30,
+        summaryFeedbackLast30,
+        chatFeedbackPrev30,
+        precedentFeedbackPrev30,
+        summaryFeedbackPrev30,
+        chatResponsesLast30,
+        precedentSearchLast30,
+        summaryLast30,
+        chatResponsesPrev30,
+        precedentSearchPrev30,
+        summaryPrev30
+      ] = await Promise.all([
+        Feedback.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
+        PrecedentFeedback.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
+        DocumentSummaryFeedback.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
+        Feedback.count({ where: { createdAt: { [Op.between]: [sixtyDaysAgo, thirtyDaysAgo] } } }),
+        PrecedentFeedback.count({ where: { createdAt: { [Op.between]: [sixtyDaysAgo, thirtyDaysAgo] } } }),
+        DocumentSummaryFeedback.count({ where: { createdAt: { [Op.between]: [sixtyDaysAgo, thirtyDaysAgo] } } }),
+        Response.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
+        PrecedentSearch.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
+        DocumentSummary.count({ where: { createdAt: { [Op.gte]: thirtyDaysAgo } } }),
+        Response.count({ where: { createdAt: { [Op.between]: [sixtyDaysAgo, thirtyDaysAgo] } } }),
+        PrecedentSearch.count({ where: { createdAt: { [Op.between]: [sixtyDaysAgo, thirtyDaysAgo] } } }),
+        DocumentSummary.count({ where: { createdAt: { [Op.between]: [sixtyDaysAgo, thirtyDaysAgo] } } })
+      ]);
+
+      const feedbackLast30 =
+        chatFeedbackLast30 + precedentFeedbackLast30 + summaryFeedbackLast30;
+      const feedbackPrev30 =
+        chatFeedbackPrev30 + precedentFeedbackPrev30 + summaryFeedbackPrev30;
+
+      const interactionsLast30 =
+        chatResponsesLast30 + precedentSearchLast30 + summaryLast30;
+      const interactionsPrev30 =
+        chatResponsesPrev30 + precedentSearchPrev30 + summaryPrev30;
+
+      const responseRateLast30 = interactionsLast30
+        ? (feedbackLast30 / interactionsLast30) * 100
+        : 0;
+      const responseRatePrev30 = interactionsPrev30
+        ? (feedbackPrev30 / interactionsPrev30) * 100
+        : 0;
+
+      return {
+        stats: {
+          totalFeedback,
+          totalFeedbackTrend: calculateTrendPercent(feedbackLast30, feedbackPrev30),
+          averageRating,
+          responseRate,
+          responseRateTrend: calculateTrendPercent(responseRateLast30, responseRatePrev30)
+        },
+        distribution,
+        recent
+      };
+    } catch (error) {
+      throw new Error(`Error fetching feedback overview: ${error.message}`);
     }
   }
 
