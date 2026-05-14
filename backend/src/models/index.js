@@ -174,6 +174,7 @@ db.Response = require("./Response")(sequelize, Sequelize);
 db.History = require("./History")(sequelize, Sequelize);
 db.DocumentSummary = require("./DocumentSummary")(sequelize, Sequelize);
 db.DocumentSummaryHistory = require("./DocumentSummaryHistory")(sequelize, Sequelize);
+db.DocumentSummaryFeedback = require("./DocumentSummaryFeedback")(sequelize, Sequelize);
 db.Feedback = require("./Feedback")(sequelize, Sequelize);
 db.Precedent = require("./Precedent")(sequelize, Sequelize);
 db.PrecedentSearch = require("./PrecedentSearch")(sequelize, Sequelize);

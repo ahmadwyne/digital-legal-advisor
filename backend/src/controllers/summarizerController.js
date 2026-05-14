@@ -55,7 +55,15 @@ const summarize = async (req, res, next) => {
 
 const submitFeedback = async (req, res, next) => {
   try {
-    const { rating, comment, documentName, summarySnippet } = req.body;
+    const {
+      rating,
+      comment,
+      documentName,
+      summarySnippet,
+      documentId,
+      documentSummaryId,
+      historyId
+    } = req.body;
     const userId = req.user?.id;
 
     if (!rating || !['like', 'dislike'].includes(rating)) {
@@ -67,10 +75,12 @@ const submitFeedback = async (req, res, next) => {
 
     const feedback = await createFeedback({
       userId,
-      feature: 'document_summarizer',
       rating,
       comment: comment || null,
-      metadata: { documentName, summarySnippet },
+      documentName,
+      summarySnippet,
+      documentId,
+      documentSummaryId: documentSummaryId || historyId
     });
 
     await ActivityLog.create({

@@ -23,5 +23,11 @@ export const adminApi = {
   getAlerts: async (limit = 10) => {
     const response = await axiosInstance.get(`/admin/alerts?limit=${limit}`);
     return response.data;
+  },
+
+  // Get feedback monitoring overview
+  getFeedbackOverview: async (limit = 10) => {
+    const response = await axiosInstance.get(`/admin/feedback/overview?limit=${limit}`);
+    return response.data;
   }
 };

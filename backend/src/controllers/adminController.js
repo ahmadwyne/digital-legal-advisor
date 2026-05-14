@@ -66,6 +66,23 @@ class AdminController {
       next(error);
     }
   }
+
+  // Get feedback monitoring overview
+  async getFeedbackOverview(req, res, next) {
+    try {
+      const { limit = 10 } = req.query;
+      const feedback = await adminService.getFeedbackOverview({
+        limit: parseInt(limit)
+      });
+
+      res.status(200).json({
+        success: true,
+        data: feedback
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new AdminController();

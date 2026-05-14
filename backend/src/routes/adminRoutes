@@ -13,5 +13,6 @@ router.get('/dashboard', adminController.getDashboard);
 router.get('/stats', adminController.getStats);
 router.get('/activity', adminController.getActivityChart);
 router.get('/alerts', adminController.getAlerts);
+router.get('/feedback/overview', adminController.getFeedbackOverview);
 
 module.exports = router;

@@ -63,6 +63,8 @@ export const useDocumentSummarizer = () => {
         rating,
         documentName: uploadedFile?.name,
         summarySnippet: summary?.content?.slice(0, 200),
+        documentId: summary?.documentId,
+        historyId: summary?.historyId,
       }).catch(() => {/* silent fail for inline like/dislike */});
     }
   }, [feedbackSubmitted, uploadedFile, summary]);
@@ -74,6 +76,8 @@ export const useDocumentSummarizer = () => {
         comment,
         documentName: uploadedFile?.name,
         summarySnippet: summary?.content?.slice(0, 200),
+        documentId: summary?.documentId,
+        historyId: summary?.historyId,
       });
       setFeedbackSubmitted(true);
       setIsFeedbackModalOpen(false);
