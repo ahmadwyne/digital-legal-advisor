@@ -1,0 +1,21 @@
+# Precedent Semantic Search — Python dependencies
+# Install with: pip install -r requirements.txt
+# These packages are already installed from the RAG service — no new downloads needed.
+
+# Embedding model (uses transformers + torch directly, no TensorFlow needed)
+transformers>=4.30.0
+torch>=2.0.0
+
+# Dataset loading (for one-time import only)
+datasets>=2.14.0
+
+# Database
+psycopg2-binary>=2.9.0
+
+# FastAPI embedding server
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+
+# Utilities
+python-dotenv>=1.0.0
+tqdm>=4.65.0

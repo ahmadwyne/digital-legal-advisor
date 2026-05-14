@@ -1,17 +1,84 @@
 /**
  * precedentSearchService.js
  *
- * Implements a lightweight keyword/TF-IDF relevance search over the
- * Precedents table. When you integrate a vector embedding store
- * (e.g. pgvector, Pinecone, or the HuggingFace dataset embeddings),
- * replace `_keywordSearch` with your semantic search call.
+ * Search strategy (automatic fallback):
+ *   1. Semantic  — calls the local embed server (precedent_semantic/embed_server.py)
+ *                  to get a 384-dim query vector, then runs a pgvector cosine
+ *                  similarity query against the `embedding` column.
+ *   2. Keyword   — TF-IDF-style LIKE search used when the embed server is
+ *                  unreachable or no rows have embeddings yet.
  *
- * HuggingFace dataset reference:
- *   https://huggingface.co/datasets/Ibtehaj10/supreme-court-of-pak-judgments
+ * The embed server runs independently on port 5001. Start it with:
+ *   uvicorn embed_server:app --host 0.0.0.0 --port 5001
+ * from the backend/precedent_semantic/ directory.
  */
 
-const { Op } = require('sequelize');
+const axios = require('axios');
+const { Op }  = require('sequelize');
 const { Precedent, PrecedentSearch, QueryPrecedent, PrecedentFeedback } = require('../models');
+
+// URL of the standalone embedding service (backend/precedent_semantic/embed_server.py)
+const EMBED_URL = (process.env.PRECEDENT_EMBED_URL || 'http://localhost:5001') + '/embed';
+
+// ── Semantic search helpers ───────────────────────────────────────────────────
+
+/**
+ * Call the local embed server to get a 384-dim vector for the query.
+ * Returns null if the server is unreachable (triggers keyword fallback).
+ */
+async function _getQueryEmbedding(text) {
+  try {
+    const res = await axios.post(
+      EMBED_URL,
+      { text },
+      { timeout: 5000 }   // 5 s — don't block the user if server is down
+    );
+    return res.data.embedding;   // float[]
+  } catch {
+    return null;   // embed server down → fall back to keyword search
+  }
+}
+
+/**
+ * Format a JS float[] as a pgvector literal string: '[0.12,0.34,...]'
+ */
+function _vecToLiteral(vec) {
+  return '[' + vec.map(v => v.toFixed(8)).join(',') + ']';
+}
+
+/**
+ * Semantic search using pgvector cosine similarity.
+ * Returns ranked array of { precedent, relevanceScore } or null if unavailable.
+ */
+async function _semanticSearch(query, topK = 10) {
+  const embedding = await _getQueryEmbedding(query);
+  if (!embedding) return null;   // server unreachable
+
+  const { sequelize } = require('../models');
+  const vecLiteral = _vecToLiteral(embedding);
+
+  const rows = await sequelize.query(
+    `SELECT
+       id, title, citation, "caseNo", court, judge, year,
+       summary, "fileUrl", keywords,
+       CAST(1 - (embedding <=> $1::vector) AS FLOAT) AS similarity
+     FROM precedents
+     WHERE embedding IS NOT NULL
+     ORDER BY embedding <=> $1::vector
+     LIMIT $2`,
+    {
+      bind: [vecLiteral, topK],
+      type: sequelize.QueryTypes.SELECT,
+    }
+  );
+
+  if (!rows || rows.length === 0) return null;   // no embedded rows yet → keyword fallback
+
+  return rows.map(r => ({
+    precedent:      r,
+    relevanceScore: Math.min(Math.max(parseFloat(r.similarity) || 0, 0), 1),
+  }));
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -129,10 +196,17 @@ async function _keywordSearch(query, topK = 10) {
 }
 
 /**
- * Main search entry point. Persists the search + results.
+ * Main search entry point. Tries semantic search first; falls back to keyword.
+ * Persists the search + results regardless of which path was taken.
  */
 exports.searchPrecedents = async ({ userId, query, topK = 10 }) => {
-  const results = await _keywordSearch(query, topK);
+  let results = await _semanticSearch(query, topK);
+  const usedSemantic = results !== null;
+
+  if (!usedSemantic) {
+    // Embed server unreachable or no embeddings in DB yet
+    results = await _keywordSearch(query, topK);
+  }
 
   // Persist search record
   const search = await PrecedentSearch.create({
