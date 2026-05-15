@@ -115,8 +115,8 @@ export const ManageDatasets = () => {
       };
 
       const [datasetsRes, statsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/v1/datasets?limit=50', { headers }),
-        fetch('http://localhost:5000/api/v1/datasets/stats', { headers })
+        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/datasets?limit=50`, { headers }),
+        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/datasets/stats`, { headers })
       ]);
 
       const datasetsData = await datasetsRes.json();
@@ -200,7 +200,7 @@ export const ManageDatasets = () => {
       setActionLoading(`delete-${selectedDataset.id}`);
       const token = getAuthToken();
       
-      const res = await fetch(`http://localhost:5000/api/v1/datasets/${selectedDataset.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/datasets/${selectedDataset.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -257,11 +257,11 @@ export const ManageDatasets = () => {
     try {
       setActionLoading(`${action}-${dataset.id}`);
       const token = getAuthToken();
-      let url = `http://localhost:5000/api/v1/datasets/${dataset.id}`;
+      let url = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/datasets/${dataset.id}`;
       let method = 'GET';
 
       if (action === 'archive') {
-        url = `http://localhost:5000/api/v1/datasets/${dataset.id}/archive`;
+        url = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/datasets/${dataset.id}/archive`;
         method = 'PATCH';
       }
 
